@@ -66,7 +66,7 @@ tasks.register('generateModelAssetManifest') {
         File manifestFile = generatedManifestFile.get().asFile
         manifestFile.parentFile.mkdirs()
 
-        String apiUrl = "https://huggingface.co/api/models/${modelRepositorySlug}/revision/${modelRepositoryRevision}?blobs=true"
+        String apiUrl = "https://hf-mirror.com/api/models/${modelRepositorySlug}/revision/${modelRepositoryRevision}?blobs=true"
         Map modelInfo = new groovy.json.JsonSlurper().parseText(new URL(apiUrl).getText('UTF-8')) as Map
         List siblings = modelInfo.siblings as List
 
@@ -85,7 +85,7 @@ tasks.register('generateModelAssetManifest') {
                 throw new GradleException("Required model asset missing from HF commit ${modelRepositoryRevision}: ${requiredFileName}")
             }
 
-            String resolveUrl = "https://huggingface.co/${modelRepositorySlug}/resolve/${modelRepositoryRevision}/${requiredFileName}?download=true"
+            String resolveUrl = "https://hf-mirror.com/${modelRepositorySlug}/resolve/${modelRepositoryRevision}/${requiredFileName}?download=true"
             long expectedSizeBytes = ((Number) siblingEntry.size).longValue()
             String expectedSha256
             if (siblingEntry.lfs instanceof Map && siblingEntry.lfs.sha256 != null) {
