@@ -12,3 +12,22 @@
 我会定期的审查我写的代码
 pr很麻烦,我可能要把我写的注释都转成英文,或者都删掉,这真的很麻烦
 我会尽量列一个清楚的改动对比清单,包含derekvawdrey的和我的
+
+## carver_altitudes.json（雕刻器高度规则，用户可编辑）
+
+`config/terrain-diffusion-mc/carver_altitudes.json` 声明哪些雕刻器的配置键是绝对海拔、哪些雕刻器整个豁免重写。首次启动会自动把默认规则写成这个文件；此后文件就是唯一规则来源——改文件（重启生效）、删条目即失效，不用动 jar。
+
+```json
+{
+  "altitudeKeys": {
+    "bettercaves:better_cave": ["bottom_y", "top_y"]
+  },
+  "excluded": [
+    "minecraft:canyon"
+  ]
+}
+```
+
+- `altitudeKeys`：键是雕刻器**类型** id（配置 JSON 的 `type` 字段），值是该配置里表示绝对海拔的键名，这些数值会随世界垂直拉伸被抬升，其余字段一概不碰；没有声明的类型原样直通。
+- `excluded`：整个豁免重写的**已配置**雕刻器 id。默认含 `minecraft:canyon`：原版峡谷是稀有近地表地貌（概率 0.01，y 10..67），被 summit 扩展+密度补偿改写会变成高频穿山天窗，故默认放过，只 carve 它原生那一段。
+- 文件解析失败时：原样保留、日志报错，内存临时用默认规则顶上，绝不覆盖手改。

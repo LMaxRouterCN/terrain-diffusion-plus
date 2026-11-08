@@ -1,6 +1,7 @@
 package com.github.xandergos.terraindiffusionmc.world;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,6 +16,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Which numbers in a carver's configuration are altitudes, so that a cave mod's carver can be
@@ -37,9 +40,12 @@ import java.util.Set;
  * -- so guessing never happens, and a mod that wants its own vertical bounds respected simply says
  * nothing (or lists itself under {@code excluded}).</p>
  *
- * <p>Declarations ship for the cave mods this mod bundles or is commonly run with, and a pack or
- * mod author can add to them, override them, or opt a carver out entirely by dropping
- * {@code config/terrain-diffusion-mc/carver_altitudes.json}:</p>
+ * <h2>The file is the source of truth</h2>
+ * <p>Rules live in {@code config/terrain-diffusion-mc/carver_altitudes.json}. On the first run
+ * the defaults below are written to that file, so every rule in force is one a user can see and
+ * edit; from then on only the file is read and these constants take no further part. A file that
+ * fails to parse is left exactly as its owner left it, with a loud report, and the defaults are
+ * used in memory until it parses again -- a user mid-edit never has their file overwritten.</p>
  *
  * <pre>{@code
  * {
@@ -51,29 +57,35 @@ import java.util.Set;
  *   ]
  * }
  * }</pre>
- *
- * <p>{@code altitudeKeys} is keyed by carver <i>type</i> id -- the {@code "type"} of a configured
- * carver JSON -- and merges with the built-in table, an empty list disabling a built-in entry.
- * {@code excluded} is a list of <i>configured</i> carver ids that are never rewritten at all, not
- * even when their configuration is a vanilla one; that is the escape hatch for a mod or pack that
- * has already tuned its carver for a tall world.</p>
  */
 public final class CarverAltitudeRules {
 
     private static final String FILE_NAME = "carver_altitudes.json";
     private static final Gson GSON = new Gson();
+    private static final Gson PRETTY = new GsonBuilder().setPrettyPrinting().create();
 
     /**
-     * Carver types whose altitude keys we know first-hand.
+     * Rules seeded into the config file on first run, and the in-memory stand-in while that file
+     * is missing or unreadable. Never merged with the file: once the file exists, it alone
+     * decides.
      *
-     * <p>Better Caves is the one this mod bundles. Its configuration nests a list of cave bands
-     * and a list of cavern bands, each band carrying the {@code bottom_y}/{@code top_y} pair that
-     * decides how far up its noise reaches; both names are unambiguous within its own config, and
-     * a key of either name occurs nowhere else in it.</p>
+     * <p>Better Caves is the mod this one bundles: its cave and cavern bands carry the
+     * {@code bottom_y}/{@code top_y} pair that decides how far up its noise reaches, and both
+     * names are unambiguous within its own config.</p>
      */
-    private static final Map<String, Set<String>> BUILT_IN = Map.of(
+    private static final Map<String, Set<String>> DEFAULT_ALTITUDE_KEYS = Map.of(
             "bettercaves:better_cave", Set.of("bottom_y", "top_y")
     );
+
+    /**
+     * Configured carvers never rewritten. Vanilla's canyon is authored as a rare, near-surface
+     * landform (probability 0.01, y 10..67, all of it under td's lowland surface): summit
+     * extension reads its top (67) being above sea level as "meant to reach the surface", and
+     * density compensation then multiplies its spawn chance by the stretched span -- together
+     * turning it into a frequent summit-piercing scar at every world scale. Left as authored it
+     * stays buried, carving only the band it was written for.
+     */
+    private static final Set<String> DEFAULT_EXCLUDED = Set.of("minecraft:canyon");
 
     private static volatile Rules rules;
 
@@ -91,7 +103,7 @@ public final class CarverAltitudeRules {
         return configuredCarverId != null && load().excluded.contains(configuredCarverId);
     }
 
-    /** Re-reads the override file. For tests and for a reload command. */
+    /** Re-reads the config file. For tests and for a reload command. */
     public static void reload() {
         rules = null;
     }
@@ -104,39 +116,78 @@ public final class CarverAltitudeRules {
 
     private static synchronized Rules loadSynchronized() {
         if (rules != null) return rules;
-        Map<String, Set<String>> keys = new HashMap<>(BUILT_IN);
-        Set<String> excluded = new HashSet<>();
-        try {
-            Path file = PlatformPaths.configDir().resolve("terrain-diffusion-mc").resolve(FILE_NAME);
-            if (Files.exists(file)) {
-                try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                    applyOverrides(GSON.fromJson(reader, JsonObject.class), keys, excluded);
-                }
+        Path file = file();
+        boolean present = Files.exists(file);
+        Rules loaded = null;
+        if (present) {
+            try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+                loaded = parse(GSON.fromJson(reader, JsonObject.class));
+            } catch (Exception e) {
+                // A malformed file is reported loudly and left exactly as its owner left it:
+                // overwriting a half-finished manual edit would destroy the user's work. The
+                // defaults stand in, in memory only, until the file parses again.
+                System.err.println("Failed to read " + FILE_NAME
+                        + ", using built-in defaults until it parses again: " + e);
             }
-        } catch (Exception e) {
-            // A malformed override must not take worldgen down: fall back to the built-in table,
-            // which is what an install without the file already uses.
-            System.err.println("Failed to load " + FILE_NAME + ", using built-in carver altitude rules: " + e);
         }
-        Rules loaded = new Rules(Map.copyOf(keys), Set.copyOf(excluded));
+        if (loaded == null) {
+            loaded = defaultRules();
+            // First run only: a file that already exists, however it got there, is never
+            // overwritten -- including one that just failed to parse.
+            if (!present) seed(file);
+        }
         rules = loaded;
-        return loaded;
+        return rules;
     }
 
-    private static void applyOverrides(JsonObject root, Map<String, Set<String>> keys, Set<String> excluded) {
-        if (root == null) return;
+    private static Path file() {
+        return PlatformPaths.configDir().resolve("terrain-diffusion-mc").resolve(FILE_NAME);
+    }
+
+    /** The rules exactly as the file states them; nothing is merged in. */
+    private static Rules parse(JsonObject root) {
+        if (root == null) return new Rules(Map.of(), Set.of());
+        Map<String, Set<String>> keys = new HashMap<>();
+        Set<String> excluded = new HashSet<>();
         JsonElement altitudeKeys = root.get("altitudeKeys");
         if (altitudeKeys != null && altitudeKeys.isJsonObject()) {
             for (Map.Entry<String, JsonElement> entry : altitudeKeys.getAsJsonObject().entrySet()) {
                 Set<String> declared = readStrings(entry.getValue());
-                if (declared.isEmpty()) {
-                    keys.remove(entry.getKey());
-                } else {
-                    keys.put(entry.getKey(), declared);
-                }
+                // An empty list declared nothing, so it rules nothing out either.
+                if (!declared.isEmpty()) keys.put(entry.getKey(), declared);
             }
         }
         excluded.addAll(readStrings(root.get("excluded")));
+        return new Rules(Map.copyOf(keys), Set.copyOf(excluded));
+    }
+
+    private static Rules defaultRules() {
+        return new Rules(Map.copyOf(DEFAULT_ALTITUDE_KEYS), Set.copyOf(DEFAULT_EXCLUDED));
+    }
+
+    /**
+     * Writes the defaults to the config file so a user can edit every rule that applies. Sorted,
+     * so that future re-seedings of a changed default diff cleanly. Failure is reported and
+     * otherwise ignored: the rules still work from memory for this session.
+     */
+    private static void seed(Path file) {
+        JsonObject root = new JsonObject();
+        JsonObject keys = new JsonObject();
+        for (Map.Entry<String, Set<String>> entry : new TreeMap<>(DEFAULT_ALTITUDE_KEYS).entrySet()) {
+            JsonArray declared = new JsonArray();
+            new TreeSet<>(entry.getValue()).forEach(declared::add);
+            keys.add(entry.getKey(), declared);
+        }
+        root.add("altitudeKeys", keys);
+        JsonArray excluded = new JsonArray();
+        new TreeSet<>(DEFAULT_EXCLUDED).forEach(excluded::add);
+        root.add("excluded", excluded);
+        try {
+            Files.createDirectories(file.getParent());
+            Files.writeString(file, PRETTY.toJson(root), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            System.err.println("Failed to write " + FILE_NAME + "; defaults stay in memory: " + e);
+        }
     }
 
     private static Set<String> readStrings(JsonElement element) {
