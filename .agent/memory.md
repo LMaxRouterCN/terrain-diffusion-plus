@@ -175,3 +175,11 @@ tag: hf-mirror, 坑, 网络环境, API坑
 PokerAgent长跑技巧(2026-11-07实证): agent框架在exec指令结束时屠杀全部后台进程(Start-Process -PassThru的子进程90s内被杀,连同java进程). 解法: schtasks /create /f /tn 名字 /tr "bat路径" /sc once /st 23:59, 再 schtasks /run /tn 名字 立即触发. 计划任务父进程=系统服务,agent屠刀够不着,构建跑满4m59s实证. 判据: bat尾部 echo %ERRORLEVEL% > 完成标记文件,轮询Get-Process+日志尾部. env变量要在bat内写死(set不穿透),init.d+bat内set对schtasks触发的构建同样生效.
 tag: PokerAgent, 技巧, schtasks, 构建坑
 <!-- END:040 -->
+<!-- ID:041 -->
+TD fork 测试实例: E:\MC\.minecraft\versions\TEST 1.20.1-Forge_47.4.10 (1.20.1 + Forge 47.4.10, 生产 jar 实测用实例, 2026-11-08 起用于 td 案实测八项)
+tag: 测试环境, Minecraft
+<!-- END:041 -->
+<!-- ID:042 -->
+TD洞穴体系关键结构(2026-11-08):mod jar-in-jar捆YUNG's Better Caves 2.0.6(默认开,properties键caves.bundled_cave_mod);caves.noise_caves=auto语义=BC在场且启用→mod自己的噪声洞穴(cave_density.json整套)关闭→BC在场时cave_density是死配置,改它无效。作者捆绑BC+auto=明确选择洞穴方案信BC。max最终决策:不关BC,走BC实例层调参(零mod侵入);cave_density修改计划撤下。max实测:BC摘除(bundled_cave_mod=false)机器能跑不崩。新bug案:世界最底层岩浆河无视基岩,基岩被捏成河床形状且捅穿,穿河面即虚空,疑似基岩渐变层(vertical_gradient -60→-55随机壳)被carver挖空上覆stone后成筛子+carver lavaLevel拉伸越界或aquifer lava。noise_settings: min_y=-64,height=2032,dimension_type min_y=-64/height=800(不一致但能跑),sea_level 63,aquifers_enabled=true,bedrock_floor渐变-60/-55。实例config在versions\TEST 1.20.1-Forge_47.4.10\config\隔离(PCL实例)。
+tag: td情报, terrain-diffusion-mc, Minecraft, bug根因
+<!-- END:042 -->

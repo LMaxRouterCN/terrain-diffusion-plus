@@ -83,6 +83,45 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - [x] 只读侦察完成（构建拓扑/依赖拓扑/环境坑位全部确认）
 - [x] 构建授权（2026-11-07 max 离场前授权:构建+收尾跑bat;口头"先clone"语义不含构建,后授权以本轮为准）
 - [x] 构建验证（2026-11-07 BUILD SUCCESSFUL 2m4s exit0,产物验尸合格:manifest/refmap/mixins×3/mods.toml/jarjar三件套;日志 D:\temp\td-b-out.log）
-- [ ] 实测清单 8 项
+- [~] 实测清单 8 项 (2026-11-08 max 首测: 1远古城市✓ 立案起因解决; 2村庄✓其余未测; 3大洞穴✓ 4岩浆河✓ 5灌水✓ 地下观感=fork设计如此; 6locate biome报错-搜脚下群系也找不到,嫌疑Holder身份比较(direct vs registry ref)待代码验证; 7is_overworld未测[仓库侧查tag文件] 8BOP未测; 附: locate structure结果正确但卡约2分钟[性能雷,嫌疑coarse map未覆盖vanilla jigsaw], 洞穴密度过高[任意处5x5到底必遇洞,调cave_density掩膜系数,决策留max])
 - [ ] 远古城市根因修复
 - [ ] locate 修复 + PR 回馈
+
+## §12 侦察结论 (2026-11-08)
+
+### 山高/世界缩放 (max 问询: 有无横竖分离配置)
+- 旋钮 = WorldScaleManager.scale, int 1-6 默认 2, per-world SavedData 落 saves/<世界>/data/terrain_diffusion_world_settings.dat
+- 换算: blockY = 海拔米数 × scale ÷ 30 + 63; 负海拔走 sqrt 压缩分支与 scale 无关 (只拉伸地上)
+- 入口: CreateWorldScreen World 标签页 mixin 注入的 WorldScaleSettingsScreen (建世界时 GUI)
+- 旧世界改 NBT 可行但有接缝风险 (fork 自警告 keep for world lifetime)
+- **无横竖分离**: 单 int, HeightConverter(垂直)/SurfaceStamp(水平间距 30/scale 米)/LocalTerrainProvider(采样) 同吃一值; 真分离需代码级拆 ≥3 消费点, 中等工作量, 留 max 决策
+
+### locate 结构 (性能)
+- far lookup 高速路: ChunkGeneratorMixin 钩 findNearestMapStructure(HEAD/RETURN 开关 scope) + FarLookupHeightMixin 拦 iterateNoiseColumn 改读 heightmap; 仅 biome 搜索 stub 未接
+- locate structure 卡 ~2min = coarse 塔冷启动 + 推理线程与 chunk 生成抢 INFERENCE_EXECUTOR; 二次 locate 应显著快 (max 可验证)
+- 既有瑕疵: mixin HEAD/RETURN 非 finally 语义, 异常路径漏关 scope 靠 120s stale 自愈; 可改 HEAD+THROW+RETURN 三点注入, 一行成本, 留 max 决策
+
+### 洞穴密度
+- cave_density.json L23=2.5 / L32=5.0 / L83=2.5 (深度带掩膜系数), 数据驱动, 调不调留 max
+
+### 其他
+- 1.21.1/1.21.11 版本存在同样 BiomeSource stub, 本次只修 1.20.1 主线
+- 模型目录冗余: 同 base 模型三份 (原名 1935MB + unknown/unspecified 变体各 968MB, ~3.8GB), fork 校验机制副作用, 磁盘卫生项
+
+### 提案可行性判定 (2026-11-08 javap 实锤)
+- vanilla BiomeSource (forge-1.20.1-47.4.10_mapped_official jar, 与测试实例 Forge 同版): findBiomeHorizontal 6参/8参两重载与 findClosestBiome3d 均为 concrete 默认实现 (javap 签名无 abstract 前缀), super 透传编译期安全
+- fork stub 的是 8 参完整版 (带 blockCheckInterval), 6 参便捷版内部委托 8 参版; 修复只需透传 8 参一处, /locate 与地图类生态调用两路全通
+- stub = 作者主动阉割可选 override, 非编译义务
+## 2026-11-08 晚: locate 修复落地 / THROW 注入排雷 / 洞穴方案转向
+- locate biome 根因与修复: BiomeSource 两 stub 返回 null → super 螺旋透传 + far-lookup scope 包裹 (唯一代码改动, versions/1.20.1/.../world/TerrainDiffusionBiomeSource.java, +16 行)
+- ChunkGeneratorMixin THROW 注入: 已回退。findNearestMapStructure 方法体 0 条 athrow + defaultRequire=1 → 零注入点 = 启动必崩; 异常经异常表穿过宿主帧、不经宿主 athrow, mixin 0.8.5 无干净写法 (作者 120s stale 自愈即为此兜底)
+- 洞穴: 决定不关捆绑 Better Caves (作者 auto 语义 = BC 优先; BC 在场时 mod 自己的噪声洞穴 json 是死配置); 岩浆河定性为 BC-off 新世界形态 (噪声洞穿基岩渐变壳 + vanilla 含水层岩浆线灌浆), BC-on 预期消失, 待游戏验证
+- 实例: 新 jar (含 locate 修复) 已装; 回滚锚 mods/terrain-diffusion-mc-forge-1.20.1-2.3.0-windows.jar.bak-locatefix (11-07 构建, 无修复)
+- 待办: 游戏验证 → git commit 过目 → 第二轮杠杆 (caves.density_compensation / OpenLoader 覆盖 BC carver json / 峡谷 liftAll 5 行分支)
+
+
+### 游戏验证结果 (2026-11-08 深夜, 新世界 BC-on)
+- locate biome: 雪原/平原/沙漠/蘑菇岛正常; 沙漠与蘑菇岛 4700+ 格外秒出 (coarse 远端采样生效, 修复有效); cherry_grove 仍找不到 — 悬案: 头号嫌疑 BiomeCatalog 未收录 (世界里不生成, 属正确找不到), 次嫌疑 niche 稀有超出搜索半径, 待查代码
+- locate structure: 古城正常; 要塞可定位但首次明显等待 (vanilla 环形搜索触发真实 chunk gen, TD 生成开销放大, 属预期非回归)
+- 世界底部: 岩浆河未捅穿基岩, 地板密封验收通过; 岩浆嵌基岩层 = BC liquid regions 设计形态且与原版含水层底部同构 (液面 -55 vs 基岩顶 -60, 中间 5 格), 世界深度为 MC 物理极限 -64 非被截短, 定性不修
+- 地面破口: 峡谷占大头 → 第二轮杠杆主项重排: 峡谷治理优先于 surface_cave; 待验 density_compensation 覆盖面 (若含 canyon 则一开关管全部, 否则走 liftAll 5 行分支)
