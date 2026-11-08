@@ -183,3 +183,15 @@ tag: 测试环境, Minecraft
 TD洞穴体系关键结构(2026-11-08):mod jar-in-jar捆YUNG's Better Caves 2.0.6(默认开,properties键caves.bundled_cave_mod);caves.noise_caves=auto语义=BC在场且启用→mod自己的噪声洞穴(cave_density.json整套)关闭→BC在场时cave_density是死配置,改它无效。作者捆绑BC+auto=明确选择洞穴方案信BC。max最终决策:不关BC,走BC实例层调参(零mod侵入);cave_density修改计划撤下。max实测:BC摘除(bundled_cave_mod=false)机器能跑不崩。新bug案:世界最底层岩浆河无视基岩,基岩被捏成河床形状且捅穿,穿河面即虚空,疑似基岩渐变层(vertical_gradient -60→-55随机壳)被carver挖空上覆stone后成筛子+carver lavaLevel拉伸越界或aquifer lava。noise_settings: min_y=-64,height=2032,dimension_type min_y=-64/height=800(不一致但能跑),sea_level 63,aquifers_enabled=true,bedrock_floor渐变-60/-55。实例config在versions\TEST 1.20.1-Forge_47.4.10\config\隔离(PCL实例)。
 tag: td情报, terrain-diffusion-mc, Minecraft, bug根因
 <!-- END:042 -->
+<!-- ID:043 -->
+[2026-11-08] terrain-diffusion-mc 四案判词浓缩(全案详见fork仓库GOAL-PLAN.md及C3/C4 commit):
+①World Scale=30/scale米/格线性(native_resolution=30,模型包world_pipeline_config.json自述实锤),MAX_SCALE=6→5m/格是分辨率地板,1m/格需换1m分辨率的模型,全球公开DEM天花板SRTM=30m,原料不存在。
+②江河(勘误2026-11-09,原判词两处误): 河宽三层漏斗:幂律wanted(radiusPixels L1183)→绝对墙min(MAX_CHANNEL_RADIUS_PX=16半径,全宽封顶32格,原判词"封顶16px=16格"语义笔误)→confinement min(wanted,0.36×谷底px); accumulation=localRunoff×cellAreaKm2(L2226,传入pixelSizeM)面积补偿→流量为物理量与scale无关(原判词此半句正确);但confinement按格计→scale1(30m/格)全宽~24格=720m(confinement墙≈12px半径先拦),scale6(5m/格)16墙生效全宽32格=160m→格数24→32不恒定,物理米宽反缩4.5倍,scale红利为负非零;泰晤士级万km²盆flow≈1e4 wanted≈60-64px被墙砍转深度;大江存在(vanilla大河3倍宽)但需万km²盆地+宽谷平原,山地confinement(谷底=两侧升高<18m)压窄成溪;湖浅<15m+小<0.135km²+无补给=puddle删除;cherry_grove三重门(气候窗+cherryNoise>0.15+rarity10 RARE)极稀有,locate找不到=半径内无样本,均非bug;实测建议:看大江用scale1+宽谷(720m级),scale6下大江封顶160m。
+③onnx-cache泄漏:缓存文件名=name-ORT版本标签-模型hash(OnnxModel L270),unknown=getImplementationVersion()返null回退,unspecified=manifest字面量;旧ORT版本条目永不清,每换捆绑ORT版本+~1.08GB;换mod jar不触发(key不含mod版本)。测试实例(E:\MC\.minecraft\versions\TEST 1.20.1-Forge_47.4.10):现役=unknown系(06-13),unspecified系1.08GB化石零风险可删;地形盘缓存terrain-diffusion-cache 7.69GB全可再生。
+④实测路:游戏内/td-explore开web地图(端口19801)俯瞰河网,是江河案唯一游戏侧验证手段。
+tag: terrain-diffusion-mc，td情报，坑
+<!-- END:043 -->
+<!-- ID:044 -->
+[2026-11-09] td fork配置架构决策:carver_altitudes.json改为播种式(source of truth模式)——首运行把默认规则落盘成用户可编辑文件,之后只读文件,内置常量仅种子+坏文件内存兜底;坏文件绝不覆盖(保留用户手改,响亮报错)。max明确偏好:反运行时硬编码/反merge式"内置+文件合并",配置必须落盘可见可改,用户删行=功能关(后果自负)。旧BUILT_IN表+BUILT_IN_EXCLUDED+applyOverrides merge语义已删。语义变更:文件缺bettercaves条目=BC不被lift。通用教训:给max做任何"默认配置"一律走落盘播种,不走代码内常量参与运行时。此前判词:vanilla canyon被reach_summits+density_compensation误伤(p0.01→0.125~0.34,y顶拉穿天窗),豁免minecraft:canyon为种子默认。
+tag: td情报, terrain-diffusion-mc, 架构决策, 用户偏好
+<!-- END:044 -->

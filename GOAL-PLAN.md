@@ -136,7 +136,8 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 
 #### 江河湖机制 (FluvialRiverNetwork.java 2608行精读)
 - 单位体系: 物理量 (流量km²/高程m/湖面积m²/meander波段m) 按现实米; 通道几何按分析px (1px=1格)
-- 河宽: radiusPixels(流量, 海拔) 幂律 (L1167-1187), 流量不随 scale 变 -> 河宽格数恒定, scale 红利为零; 泰晤士级流量算出~64px 也被 min(16px) 封顶, 砍掉的宽度转深度
+- 河宽(勘误2026-11-09,原判词两处误): MAX_CHANNEL_RADIUS_PX=16.0f是半径→全宽封顶32格(原"封顶16px=16格"语义笔误); accumulation=localRunoff×cellAreaKm2(L2226,accumulateRunoff传入pixelSizeM)面积补偿→流量为物理量与scale无关(原判词此半句正确);
+-   但confinement/谷底扫描全按格计→scale1(30m/格):扫描16px/侧,allowed≈12px半径,全宽~24格=720m,confinement墙先拦,16墙摸不到; scale6(5m/格):扫描clamp48px/侧,16墙生效,全宽32格=160m; 格数24→32不恒定,物理米宽反缩4.5倍,scale红利为负非零; 泰晤士级(万km²盆,flow≈1e4)wanted≈60-64px被墙砍,宽度转深度(boost≤2x)
 - 山地挤压: CONFINEMENT_FRACTION=0.72 (河最多占谷底72%), 谷底=两侧升高<18m 区域, 陡坡谷底一两百米宽 -> TD 山地河天然溪化; 大河只能在宽谷平原 (需万km²级盆地)
 - 湖: 浅(<15m)+小(<135000m², scale2下约600px²/22x22格)+无河流补给 = puddle 删除; 有效湖有碗状加深 (2-12格深, 4-40px半径) — lake bowls 机制
 - meander: 幅度=2.4x河宽 (78m起), 波段240/720/2160m, scale2下720m波段=48格波长
@@ -166,3 +167,14 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - 清理账: onnx-cache 2.17GB (一半是化石); terrain-diffusion-cache 地形盘缓存 7.69GB (全可再生,
   删除=已探索区域重新推理); 回滚锚 jar.bak-locatefix 7.8MB (验收已过); 空模型目录 4 处
 
+
+### 峡谷豁免案: B 杠杆落地 (2026-11-09)
+- 根因(代码实锤): vanilla canyon(原生 p=0.01, y 10..67) 被 reach_summits 拉顶(67>SEA_LEVEL 63 误判"应达地表") + density_compensation 按拉伸 span 放大概率(0.125~0.34, level build height 800 vs noise_settings 2032 不一致所致) -> 高频穿山天窗; BC 只换洞穴 carver 不碰峡谷(ScaledCarvers L150 注释), scale1 同中招(rewritingBands 默认 true)
+- max 口谕: B 进模组默认 + "不硬编码:没文件落盘默认,有文件只读文件" -> 播种式配置: 首运行写 config/terrain-diffusion-mc/carver_altitudes.json(种子= bettercaves 高度键 + minecraft:canyon 豁免), 之后文件即唯一事实源; 坏文件只报错不覆盖, 内存兜底种子
+- 语义变更: 文件缺 bettercaves 条目 = BC 不 lift(山实心); README_OLD "空列表禁用内置条目"失效; fork README.md 本就缺 carver_altitudes 文档段(文档债待补)
+- commit: 0720001(硬编码式) -> 本轮播种式替代; 未 push
+- 待: 过目 -> 构建(maven.neoforged 网络坑备案) -> 替换实例 jar -> 新世界实测峡谷频率
+- 构建验收(2026-11-09): buildForgeWindows exit=0, CarverAltitudeRules.class 已入产物, 验尸全绿; 实例现役 jar 已替换, 回滚锚 .bak-canyonfix (旧锚 locatefix 保留)
+- 下一步: 开新世界实测峡谷频率 (BC-on, 任意种子; 观察点: 山面破口应归零, 峡谷回稀有地下形态; 首次启动会在 config/terrain-diffusion-mc/ 落盘 carver_altitudes.json)
+- 峡谷豁免案结案 (2026-11-09 max 实测): 基本通过, 峡谷改动生效。B 杠杆(播种式 carver_altitudes.json, minecraft:canyon 默认豁免)落地闭环: 根因→改码→过闸→构建→验尸→替换→实测。播种路径(首启动落盘)随本次实测一并验证
+- 悬案清账 (2026-11-09, max 授权"随便"): 0720001+aaa9eb1 squash 为单 commit; javac 编码钉 UTF-8(三版本根, 52 条 GBK 警告绝根, 全量构建复验中); README 补 carver_altitudes 文档段; 案卷归档; push 仍未动
