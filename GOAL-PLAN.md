@@ -151,3 +151,18 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - 不变的: 推理成本, 河宽格数, 湖格数, 玩家跑图格数成本
 - 变的: 同格数覆盖的现实地貌 ÷scale² (多样性缩水); vanilla 装饰现实密度 ×scale² (树/草 authored 按格, scale6 森林×9密度)
 - 1px=1格推论: scale 对江河形态无影响, 想看大河与 scale 无关
+
+### 调查案卷: onnx-cache 双变体与磁盘膨胀 (2026-11-08)
+
+- 现象: onnx-cache 2.17GB, 每个模型存两份 (base-unknown-*/base-unspecified-*), hash 相同
+- 成因: 缓存文件名 = name + ORT版本标签 + 模型SHA-256前16位 (OnnxModel L270 resolveOptimizedModelPath).
+  unknown = getImplementationVersion() 返回 null; unspecified = 某版本 ORT manifest 字面量.
+  双份 = 历史跑过两个 ORT 版本 (各生成一套), 旧条目无清理机制 -> 慢性泄漏, 每换一次 ORT 版本 +约1.08GB
+  (EXTENDED_OPT 优化后 base 1936MB->967.9MB, 减重一半, 每套变体约 1.08GB)
+- 优化在构造函数无条件执行 (先于 GPU/CPU 分支), GPU 模式同样写缓存
+- AX 误判修正: build.variant (windows) 与缓存文件名无关, 文件名段是 ORT 版本标签
+- 现役判定: 两 jar 均 build.variant=windows 但 cache 无第三种标签 -> 现役 ORT 复用 unknown/unspecified 之一
+  (以 mtime 为准, 见下), 删错那份代价 = 下次启动重新优化几分钟, 无害
+- 清理账: onnx-cache 2.17GB (一半是化石); terrain-diffusion-cache 地形盘缓存 7.69GB (全可再生,
+  删除=已探索区域重新推理); 回滚锚 jar.bak-locatefix 7.8MB (验收已过); 空模型目录 4 处
+
