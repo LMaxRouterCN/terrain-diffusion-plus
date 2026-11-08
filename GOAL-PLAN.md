@@ -125,3 +125,29 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - locate structure: 古城正常; 要塞可定位但首次明显等待 (vanilla 环形搜索触发真实 chunk gen, TD 生成开销放大, 属预期非回归)
 - 世界底部: 岩浆河未捅穿基岩, 地板密封验收通过; 岩浆嵌基岩层 = BC liquid regions 设计形态且与原版含水层底部同构 (液面 -55 vs 基岩顶 -60, 中间 5 格), 世界深度为 MC 物理极限 -64 非被截短, 定性不修
 - 地面破口: 峡谷占大头 → 第二轮杠杆主项重排: 峡谷治理优先于 surface_cave; 待验 density_compensation 覆盖面 (若含 canyon 则一开关管全部, 否则走 liftAll 5 行分支)
+
+### 调查案卷: 江河湖与 World Scale (2026-11-08 深夜)
+
+#### World Scale 数学 (已实锤)
+- README_OLD L352: `scale=1 => 30m/block, scale=2 => 15m/block` — 线性 30/scale, 随世界存档保存, 并决定新世界高度上限与 GPU/CPU 性能配比
+- WorldScaleManager: DEFAULT_SCALE=2, MIN=1, MAX=6 (UI 与 clamp 双重封顶); 垂直海拔以上区域 ×scale 拉伸, 海平面以下任何 scale 不拉伸 (README_OLD L157-158)
+- LocalTerrainProvider L1023: `pixelSizeM = NATIVE_RESOLUTION / scale` — 水文分析 1px = 30/scale 米 = 1 游戏格 (hydrology tile 2048 格 = 2048px 分析网格; TileKey 含 scale)
+- 推论: 1m/格 = scale30 不可达 (3000m 山 > 2032 格维度上限, 物理装不下); 本 mod 分辨率地板 = scale6 = 5m/格
+
+#### 江河湖机制 (FluvialRiverNetwork.java 2608行精读)
+- 单位体系: 物理量 (流量km²/高程m/湖面积m²/meander波段m) 按现实米; 通道几何按分析px (1px=1格)
+- 河宽: radiusPixels(流量, 海拔) 幂律 (L1167-1187), 流量不随 scale 变 -> 河宽格数恒定, scale 红利为零; 泰晤士级流量算出~64px 也被 min(16px) 封顶, 砍掉的宽度转深度
+- 山地挤压: CONFINEMENT_FRACTION=0.72 (河最多占谷底72%), 谷底=两侧升高<18m 区域, 陡坡谷底一两百米宽 -> TD 山地河天然溪化; 大河只能在宽谷平原 (需万km²级盆地)
+- 湖: 浅(<15m)+小(<135000m², scale2下约600px²/22x22格)+无河流补给 = puddle 删除; 有效湖有碗状加深 (2-12格深, 4-40px半径) — lake bowls 机制
+- meander: 幅度=2.4x河宽 (78m起), 波段240/720/2160m, scale2下720m波段=48格波长
+- 判词: 无bug, 全有意设计. 玩家未见大河 = 探索半径不够(大盆地远) + 山地谷窄. 实测路: /td-explore web地图 (端口19801) 俯瞰河网
+
+#### cherry_grove 终判 (biome_catalog.json L4131)
+- 收录: 是 (3条 mountain 规则: 雨量360-1100/1100-2600两段+海拔1000上下分段, 温度窗6-18.5C, 坡<=0.52, 湿0.58-0.9)
+- 稀有机制: climate 窗命中 -> cherryNoise 噪声闸 (>0.15-0.18) -> rarity 10.0 (RARE档, 权重<1+更严噪声阈值, 见 BiomeCatalogSmokeTest) 三重门
+- 判词: 存在但极稀有, /locate biome 找不到 = 搜索半径内无样本, 属正确行为非bug
+
+#### 抬 scale 的真实代价账
+- 不变的: 推理成本, 河宽格数, 湖格数, 玩家跑图格数成本
+- 变的: 同格数覆盖的现实地貌 ÷scale² (多样性缩水); vanilla 装饰现实密度 ×scale² (树/草 authored 按格, scale6 森林×9密度)
+- 1px=1格推论: scale 对江河形态无影响, 想看大河与 scale 无关
