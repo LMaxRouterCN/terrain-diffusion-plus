@@ -297,11 +297,25 @@ public class TerrainDiffusionBiomeSource extends BiomeSource {
 
     @Override
     public Pair<BlockPos, Holder<Biome>> findClosestBiome3d(BlockPos origin, int radius, int horizontalBlockCheckInterval, int verticalBlockCheckInterval, Predicate<Holder<Biome>> predicate, Climate.Sampler noiseSampler, LevelReader world) {
-        return null;
+        // [locate 修复 2026-11-08] 原 stub 直接返回 null, /locate biome 因此报废 (上游残留)。
+        // 透传 vanilla 基类螺旋搜索 (javap 实锤 concrete, 非抽象义务); 外包 far-lookup scope,
+        // 让远端群系采样走 coarse 近似数据 (与 ChunkGeneratorMixin 结构搜索同一机制, 计数器可重入)。
+        LocalTerrainProvider.beginFarLookup();
+        try {
+            return super.findClosestBiome3d(origin, radius, horizontalBlockCheckInterval, verticalBlockCheckInterval, predicate, noiseSampler, world);
+        } finally {
+            LocalTerrainProvider.endFarLookup();
+        }
     }
 
     @Override
     public Pair<BlockPos, Holder<Biome>> findBiomeHorizontal(int x, int y, int z, int radius, int blockCheckInterval, Predicate<Holder<Biome>> predicate, RandomSource random, boolean bl, Climate.Sampler noiseSampler) {
-        return null;
+        // [locate 修复 2026-11-08] 6 参便捷版内部委托 8 参版; 探险家地图等生态可能直呼本重载, 一并透传。
+        LocalTerrainProvider.beginFarLookup();
+        try {
+            return super.findBiomeHorizontal(x, y, z, radius, blockCheckInterval, predicate, random, bl, noiseSampler);
+        } finally {
+            LocalTerrainProvider.endFarLookup();
+        }
     }
 }
