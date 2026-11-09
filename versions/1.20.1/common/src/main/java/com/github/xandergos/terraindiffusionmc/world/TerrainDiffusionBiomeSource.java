@@ -41,6 +41,11 @@ public class TerrainDiffusionBiomeSource extends BiomeSource {
                     RegistryOps.retrieveGetter(Registries.BIOME)
             ).apply(instance, instance.stable(TerrainDiffusionBiomeSource::new)));
 
+    // [长期记忆: 047] biome_source 注册表按对象身份反查 codec, 而 MapCodec.codec() 每次调用
+    // 返回新包装实例; 注册与 codec() 必须是同一对象, 否则保存时 WorldGenSettings 编码报
+    // "Unknown registry element", level.dat 写残 (seed 陪葬), 重进读档即炸。
+    public static final Codec<TerrainDiffusionBiomeSource> CODEC_INSTANCE = CODEC.codec();
+
     private final HolderGetter<Biome> biomeLookup;
     private volatile Map<Short, Holder<Biome>> biomeIndexMap = null;
     /** The subset of {@link #biomeIndexMap} this source will actually ever return. */
@@ -52,7 +57,8 @@ public class TerrainDiffusionBiomeSource extends BiomeSource {
 
     @Override
     protected Codec<? extends BiomeSource> codec() {
-        return CODEC.codec();
+        // [长期记忆: 047] 返回注册时用的同一实例, 注册表身份反查才能命中
+        return CODEC_INSTANCE;
     }
 
     private void requireBiomeIndexMap() {

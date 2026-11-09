@@ -76,7 +76,8 @@ public final class TerrainDiffusionLifecycle {
      * Registers the common biome source codec through the active loader's registry hook.
      */
     public static void registerBiomeSourceCodecs(CodecRegistrar<Codec<? extends BiomeSource>> registrar) {
-        registrar.register(TERRAIN_DIFFUSION_ID, TerrainDiffusionBiomeSource.CODEC.codec());
+        // [长期记忆: 047] 注册单例 CODEC_INSTANCE, 与实例 codec() 返回同一对象; 注册表按身份反查
+        registrar.register(TERRAIN_DIFFUSION_ID, TerrainDiffusionBiomeSource.CODEC_INSTANCE);
     }
 
     /**
