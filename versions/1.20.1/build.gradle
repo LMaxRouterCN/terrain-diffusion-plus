@@ -355,13 +355,19 @@ subprojects { subproject ->
                     // Nested only, not put on the development runtime classpath: a published Forge
                     // 1.20.1 jar is SRG-mapped and would not run against a mojmap development
                     // classpath. The distribution jar is what carries it.
-                    jarJar(implementation('maven.modrinth:yungs-api')) {
+                    // 版本钉死(离线确定性构建): 无版本号坐标迫使 Gradle 每次构建都查询 Modrinth maven
+                    // 的版本列表, 本机网络环境下该查询无限挂死; 下方 version block 的 strictly 已
+                    // 锁定此单版本, 钉死坐标语义完全等价, 且构建可离线完成。
+                    jarJar(implementation('maven.modrinth:yungs-api:1.20-Forge-4.0.6')) {
                         version {
                             strictly '[1.20-Forge-4.0.6]'
                             prefer '1.20-Forge-4.0.6'
                         }
                     }
-                    jarJar(implementation('maven.modrinth:yungs-better-caves')) {
+                    // 版本钉死(离线确定性构建): 无版本号坐标迫使 Gradle 每次构建都查询 Modrinth maven
+                    // 的版本列表, 本机网络环境下该查询无限挂死; 下方 version block 的 strictly 已
+                    // 锁定此单版本, 钉死坐标语义完全等价, 且构建可离线完成。
+                    jarJar(implementation('maven.modrinth:yungs-better-caves:1.20.1-Forge-2.0.6')) {
                         version {
                             strictly '[1.20.1-Forge-2.0.6]'
                             prefer '1.20.1-Forge-2.0.6'
