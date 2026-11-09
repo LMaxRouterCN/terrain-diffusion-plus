@@ -200,7 +200,7 @@ TD fork 构建配方 (2026-11-10 实证): buildForgeWindows 任务必须以 vers
 tag: 构建坑, terrain-diffusion-mc, buildForgeWindows
 <!-- END:045 -->
 <!-- ID:046 -->
-TD 种子架构 (2026-11-10 定罪): TerrainDiffusionLifecycle.onWorldLoad(OVERWORLD) → LocalTerrainProvider.init(world.getSeed()) 接线正常, 接口层吃 world seed。但 WorldPipeline.setSeed 作用半径 = 只重建 SyntheticMapFactory (气候/群系合成图噪声, per-seed); 主地形 elevation = ONNX 从 latent 解码, 该路径不吃 seed → 同坐标同地形。实测吻合: 新世界地形指纹 (冰湖等) 复现, 群系会变。explorer 的 /api/new_seed 同理只换合成图。注意: latent 构造链未逐行追 (判据 = setSeed 代码半径 + max 实测)。修复方向 (未批): latent 掺 seed, 需先追构造链, 属上游架构改动。
+TD 种子架构 (2026-11-10 D5-U1 侦查强化): 主地形链 = coarse(20步DPM-Solver++) → latent(2步flow-matching) → decoder; elevation 直接读 latents 平面4/5 (getLatentElevation, w=平面5, v=平面4/w, sign(v)*v*v 反归一)。**冒烟枪**: latent 初始噪声 (init_latent_map) 与步进 (step_latent_map_0) 传硬编码常数 5819/5820 进 latentBatch, 非管线种子 → 地基噪声跨种子恒同 (函数体 D5-U2 确认中)。SyntheticMapFactory(seed) per-seed 噪声通道 0..4 + seed 无关 WorldClim 分位数, 喂 coarse → 种子只走条件路径 (摇动群系/气候, 摇不动地形, 与 max 实测"群系变山不变"吻合)。WorldPipeline ctor: seed 存储 + syntheticMapFactory(seed) + MemoryTileStore(纯内存) + 三阶段构建; LocalTerrainProvider.init(world.getSeed()) 接线正常 (Lifecycle L115)。种子案 B (max 已批必修): 固定常数改种子派生 (5819/5820 + coarse/decoder 阶段同款常数待 D5-U2 找齐); **磁盘缓存雷**: hydrology/coarse_drainage disk_cache namespace 默认"default"疑不含种子, 换种子重访旧区可能读旧种子的盘缓存, key 构造核实中, 修 B 时需自动掺种子。
 tag: td情报, terrain-diffusion-mc, 种子
 <!-- END:046 -->
 <!-- ID:047 -->

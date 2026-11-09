@@ -224,3 +224,9 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - codec 修复: TerrainDiffusionBiomeSource.CODEC_INSTANCE 静态单例, codec() 与注册点同用一对象; 根因 = 注册表身份反查 vs MapCodec.codec() 每次新实例 (长期记忆 047)。验证: 建世界进退重进, log 无 Unknown registry element 且 seed 非空。
 - 种子案 B (max 拍板, 必修): latent 构造链侦查在途 (生成点 / 缓存 key 是否带 seed / 随机源), 掺 seed 施工待链路清楚后进行。已知代价: 掺 seed 后换 seed 跨界区块有地形接缝, 已生成的区块不受影响。
 - DF 同病检查: TerrainDiffusionDensityFunction / NoiseCavesFlagDensityFunction 的 CODEC 模式侦查结果见 D5-U1 回执。
+## 2026-11-10 03:5x: 种子案 B 结案 (嫌疑归零), 两案合并为 codec 根因
+
+- 复核 WorldPipeline 三阶段全文: coarse 条件噪声 generateInto(seed) / 初始采样 generateInto(seed+1) / latent 初始 5819 与步进 5820 / decoder 5819 —— 全部为"管线种子 + 偏移", 全链条吃 seed, 接线健康。5819/5820 是噪声用途偏移而非硬编码种子 (D5-U1 初判有误, 修正)。
+- 地形复现的真嫌疑: level.dat 写残 (codec 案) 之下新世界 seed 未能真正随机/落盘, 复用旧值 → 同一噪声链 → 同一地形。两案合并, codec 修复 (f58966e) 极可能附带结案种子案。
+- 磁盘缓存雷排除: HydrologyProvider/CoarseDrainageProvider 的 TileKey 含 seed 字段, 盘缓存路径 seed-<hex> 分目录, 换种子不污染 (L164 注释明示 persist 后跨种子保留)。之前"namespace 疑不含种子"的担忧不成立, 收回。
+- 待 max 实测: 建世界 → 进 → 退 → 重进 (codec 案判决), 同时观察新世界地形是否变化 (种子案判决)。
