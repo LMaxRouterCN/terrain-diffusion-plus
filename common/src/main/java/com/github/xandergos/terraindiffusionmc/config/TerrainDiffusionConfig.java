@@ -44,7 +44,9 @@ public final class TerrainDiffusionConfig {
     private static final boolean DEFAULT_SNOW_DEPTH_SCALING = true;
     private static final int DEFAULT_SNOW_MAX_LAYERS_OVER_VEGETATION = 6;
     private static final boolean DEFAULT_MOUNTAIN_CAVERNS = true;
-    private static final float DEFAULT_MOUNTAIN_CAVERN_CHANCE_PERCENT = 30f;
+    private static final float DEFAULT_MOUNTAIN_CAVERN_CHANCE_PERCENT = 15f;
+    private static final boolean DEFAULT_SURFACE_SHELL = true;
+    private static final int DEFAULT_SURFACE_SHELL_THICKNESS = 30;
     /**
      * Whole world by default: Sengoku Jidai rethemes the 64 vanilla biomes globally, so confining
      * its own 15 biomes to a sub-region would read as an inconsistency (Japanese-looking forests
@@ -455,6 +457,26 @@ public final class TerrainDiffusionConfig {
 
     public static float mountainCavernChancePercent() {
         return readFloatInRange("caves.mountain_caverns.chance", DEFAULT_MOUNTAIN_CAVERN_CHANCE_PERCENT, 0f, 100f);
+    }
+
+    /**
+     * Whether carvers carving above scale 1 are kept from writing air near the surface, so
+     * caves stay inside the terrain: no mouths on flat ground, no scars on summits, no holes
+     * in the sea floor. Carvers under {@code shellExempt} in carver_altitudes.json are left
+     * alone either way. No effect at world scale 1, where vanilla cave mouths belong.
+     */
+    public static boolean surfaceShellEnabled() {
+        return readBoolean("caves.surface_shell", DEFAULT_SURFACE_SHELL);
+    }
+
+    /**
+     * How many blocks below the surface the shell refuses to carve, clamped to 1..256. The
+     * surface is read from the OCEAN_FLOOR heightmap, which is the ground on land and the sea
+     * floor under water, so one thickness protects both.
+     */
+    public static int surfaceShellThickness() {
+        int thickness = readPositiveInt("caves.surface_shell.thickness", DEFAULT_SURFACE_SHELL_THICKNESS);
+        return Math.min(thickness, 256);
     }
 
     /**

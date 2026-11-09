@@ -54,6 +54,9 @@ import java.util.TreeSet;
  *   },
  *   "excluded": [
  *     "othermod:vertical_shaft"
+ *   ],
+ *   "shellExempt": [
+ *     "minecraft:canyon"
  *   ]
  * }
  * }</pre>
@@ -84,8 +87,24 @@ public final class CarverAltitudeRules {
      * density compensation then multiplies its spawn chance by the stretched span -- together
      * turning it into a frequent summit-piercing scar at every world scale. Left as authored it
      * stays buried, carving only the band it was written for.
+     *
+     * <p>Better Caves' surface cave exists to open cave mouths: authored as a vanilla-style
+     * carver at 0.15 per chunk with a band topping out at y=180, but lifted to the world ceiling
+     * and density-compensated to nearly every start chunk it sheets whole mountainsides with
+     * entrances. Left as authored it stays a rare, lowland cave-maker -- and the surface shell
+     * ({@code caves.surface_shell}) is what keeps even its lowland mouths sealed.</p>
      */
-    private static final Set<String> DEFAULT_EXCLUDED = Set.of("minecraft:canyon");
+    private static final Set<String> DEFAULT_EXCLUDED = Set.of(
+            "minecraft:canyon", "bettercaves:surface_cave");
+
+    /**
+     * Carvers the surface shell leaves alone. Shelling a landform that was never a problem
+     * would only cut it into shape: vanilla's canyon is deliberately buried (see
+     * {@link #DEFAULT_EXCLUDED}) and only its floors come near the surface, so the shell would
+     * trim away the top half of every canyon. The price of the exemption is the rare opening a
+     * canyon still makes on the sea floor; delete the entry to shell it too.
+     */
+    private static final Set<String> DEFAULT_SHELL_EXEMPT = Set.of("minecraft:canyon");
 
     private static volatile Rules rules;
 
@@ -101,6 +120,11 @@ public final class CarverAltitudeRules {
     /** Whether {@code configuredCarverId} opted out of being rewritten at all. */
     public static boolean isExcluded(String configuredCarverId) {
         return configuredCarverId != null && load().excluded.contains(configuredCarverId);
+    }
+
+    /** Whether {@code configuredCarverId} opted out of the surface shell. */
+    public static boolean isShellExempt(String configuredCarverId) {
+        return configuredCarverId != null && load().shellExempt.contains(configuredCarverId);
     }
 
     /** Re-reads the config file. For tests and for a reload command. */
@@ -146,9 +170,10 @@ public final class CarverAltitudeRules {
 
     /** The rules exactly as the file states them; nothing is merged in. */
     private static Rules parse(JsonObject root) {
-        if (root == null) return new Rules(Map.of(), Set.of());
+        if (root == null) return new Rules(Map.of(), Set.of(), Set.of());
         Map<String, Set<String>> keys = new HashMap<>();
         Set<String> excluded = new HashSet<>();
+        Set<String> shellExempt = new HashSet<>();
         JsonElement altitudeKeys = root.get("altitudeKeys");
         if (altitudeKeys != null && altitudeKeys.isJsonObject()) {
             for (Map.Entry<String, JsonElement> entry : altitudeKeys.getAsJsonObject().entrySet()) {
@@ -158,11 +183,13 @@ public final class CarverAltitudeRules {
             }
         }
         excluded.addAll(readStrings(root.get("excluded")));
-        return new Rules(Map.copyOf(keys), Set.copyOf(excluded));
+        shellExempt.addAll(readStrings(root.get("shellExempt")));
+        return new Rules(Map.copyOf(keys), Set.copyOf(excluded), Set.copyOf(shellExempt));
     }
 
     private static Rules defaultRules() {
-        return new Rules(Map.copyOf(DEFAULT_ALTITUDE_KEYS), Set.copyOf(DEFAULT_EXCLUDED));
+        return new Rules(Map.copyOf(DEFAULT_ALTITUDE_KEYS), Set.copyOf(DEFAULT_EXCLUDED),
+                Set.copyOf(DEFAULT_SHELL_EXEMPT));
     }
 
     /**
@@ -182,6 +209,9 @@ public final class CarverAltitudeRules {
         JsonArray excluded = new JsonArray();
         new TreeSet<>(DEFAULT_EXCLUDED).forEach(excluded::add);
         root.add("excluded", excluded);
+        JsonArray shellExempt = new JsonArray();
+        new TreeSet<>(DEFAULT_SHELL_EXEMPT).forEach(shellExempt::add);
+        root.add("shellExempt", shellExempt);
         try {
             Files.createDirectories(file.getParent());
             Files.writeString(file, PRETTY.toJson(root), StandardCharsets.UTF_8);
@@ -200,5 +230,6 @@ public final class CarverAltitudeRules {
         return values;
     }
 
-    private record Rules(Map<String, Set<String>> altitudeKeys, Set<String> excluded) {}
+    private record Rules(Map<String, Set<String>> altitudeKeys, Set<String> excluded,
+                         Set<String> shellExempt) {}
 }

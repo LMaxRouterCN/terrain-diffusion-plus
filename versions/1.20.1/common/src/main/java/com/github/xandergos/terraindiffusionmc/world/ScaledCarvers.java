@@ -101,6 +101,14 @@ public final class ScaledCarvers {
     private static volatile int worldMinY = VANILLA_MIN_Y;
     private static volatile int worldMaxY = VANILLA_MAX_Y;
 
+    /**
+     * Rebuilt carver instances, mapped back to the registered configured carver each was made
+     * from. The surface shell asks {@link #configuredCarverId} for a carver's id to look up
+     * {@code shellExempt}, and a rebuilt instance is not in the registry; this map is how it
+     * answers. Cleared together with {@link #LIFTED}.
+     */
+    private static final Map<ConfiguredWorldCarver<?>, String> ORIGIN_BY_LIFTED = new ConcurrentHashMap<>();
+
     /** Carver types whose configuration could not be rebuilt; complained about once each. */
     private static final Set<String> WARNED = ConcurrentHashMap.newKeySet();
 
@@ -116,6 +124,7 @@ public final class ScaledCarvers {
         worldMaxY = level.getMaxBuildHeight() - 1;
         LIFTED.clear();
         WARNED.clear();
+        ORIGIN_BY_LIFTED.clear();
     }
 
     /** The carvers of one biome, with their altitudes moved into a world of the given scale. */
@@ -127,6 +136,7 @@ public final class ScaledCarvers {
             // A single server has one scale; this only fires when a world of a different scale is
             // loaded in the same process, which invalidates everything cached for the old one.
             LIFTED.clear();
+            ORIGIN_BY_LIFTED.clear();
             liftedScale = scale;
         }
         int liftScale = lifting ? scale : 1;
@@ -191,6 +201,7 @@ public final class ScaledCarvers {
             if (carver == null) continue;
             ConfiguredWorldCarver<?> lifted = (scale > 1 || rewritingBands()) && !CarverAltitudeRules.isExcluded(id.toString())
                     ? liftValue(carver, scale) : null;
+            if (lifted != null) ORIGIN_BY_LIFTED.put(lifted, id.toString());
             restored.add(Holder.direct(lifted == null ? carver : lifted));
         }
         return restored;
@@ -199,7 +210,11 @@ public final class ScaledCarvers {
     private static Holder<ConfiguredWorldCarver<?>> lift(Holder<ConfiguredWorldCarver<?>> holder, int scale) {
         if (isExcluded(holder)) return holder;
         ConfiguredWorldCarver<?> lifted = liftValue(holder.value(), scale);
-        return lifted == null ? holder : Holder.direct(lifted);
+        if (lifted == null) return holder;
+        // A rebuilt instance has no registry key of its own; remember which registered carver
+        // it stands for so configuredCarverId can still answer for it.
+        holder.unwrapKey().ifPresent(key -> ORIGIN_BY_LIFTED.put(lifted, key.location().toString()));
+        return Holder.direct(lifted);
     }
 
     /** The carver with its altitudes moved into world space, or null to use it as it is. */
@@ -207,6 +222,24 @@ public final class ScaledCarvers {
         CarverConfiguration lifted = liftConfig(carver.config(), scale);
         if (lifted != null) return reconfigure(carver, lifted);
         return liftDeclaredAltitudes(carver, scale);
+    }
+
+    /**
+     * The registered id of a configured carver -- "bettercaves:better_cave", "minecraft:cave"
+     * -- or null when the instance is neither in the registry nor one this class rebuilt from
+     * a registered carver. The surface shell uses it to look up {@code shellExempt} in
+     * {@link CarverAltitudeRules}.
+     */
+    public static String configuredCarverId(ConfiguredWorldCarver<?> carver) {
+        RegistryAccess access = registries;
+        if (access == null) return null;
+        Registry<ConfiguredWorldCarver<?>> registry =
+                access.registry(Registries.CONFIGURED_CARVER).orElse(null);
+        if (registry != null) {
+            ResourceLocation id = registry.getKey(carver);
+            if (id != null) return id.toString();
+        }
+        return ORIGIN_BY_LIFTED.get(carver);
     }
 
     /** Whether a pack asked for this configured carver to be run exactly as authored. */
@@ -464,3 +497,4 @@ public final class ScaledCarvers {
         return new ConfiguredWorldCarver((WorldCarver) carver.worldCarver(), config);
     }
 }
+
