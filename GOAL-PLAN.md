@@ -230,3 +230,15 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - 地形复现的真嫌疑: level.dat 写残 (codec 案) 之下新世界 seed 未能真正随机/落盘, 复用旧值 → 同一噪声链 → 同一地形。两案合并, codec 修复 (f58966e) 极可能附带结案种子案。
 - 磁盘缓存雷排除: HydrologyProvider/CoarseDrainageProvider 的 TileKey 含 seed 字段, 盘缓存路径 seed-<hex> 分目录, 换种子不污染 (L164 注释明示 persist 后跨种子保留)。之前"namespace 疑不含种子"的担忧不成立, 收回。
 - 待 max 实测: 建世界 → 进 → 退 → 重进 (codec 案判决), 同时观察新世界地形是否变化 (种子案判决)。
+## D6 (2026-11-10 晨) - 种子封卷 / 洞穴密度 / DH 评估
+
+- [x] 种子案封卷: max 连建多世界地形各异, 链路健康无 bug (上轮"两案合并"推定被实测推翻, 重开重验后以新证据封卷)
+- [x] codec 案: max 实测存读不崩, 结案
+- [x] 洞穴密度: 杠杆 = BC jar 内 better_cave.json 的 cave_spawn_chance (区域级洞穴生成率, TD 密度补偿不触及它; vanilla probability 是死旋钮 - x3.34 补偿封顶)
+  - 落地: 实例 config\openloader\data\z-bc-cave-density\ 数据包, 100.0 -> 70.0 (-30%, "降低一点"档)
+  - 仅新世界生效 (worldgen 注册表建世界时序列化进 level.dat); 测试法 = 新世界挖竖井
+  - 侦查教训: BC 以 jarJar 捆在 TD 主 jar META-INF/jarjar/ (Forge 路径), 非 META-INF/jars/ (Fabric 路径) - 三轮扑空的根因, 记忆已档
+- [x] DH 加速 LOD 生成可行性评估: 报告 D:\Documents\my\日常\DH加速LOD生成-可行性评估-2026-11-10.md
+  - 结论: 可行, 官方 worldGenOverrides 入口, 典型 2-4 天, 最大风险 = wrapper 获取
+  - 待 max: 做不做 / 单机或联机范围 / 依赖策略
+- [ ] 本轮: commit (本文件) + push (github 直连恢复窗口待定)
