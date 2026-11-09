@@ -213,3 +213,9 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - 待实测 (max): 新世界看三指标 (洞不穿地表 / 地表下保厚 / 密度降档), 观察点 = 平地洞口/山面破口/海床洞 归零, 崖壁低位口应留存; 首启动 config 落盘的 carver_altitudes.json 应含 excluded:[canyon, surface_cave] + shellExempt:[canyon]
 ### 日期勘误 (2026-11-09 夜)
 - 本文件 2026-11-10 凌晨/晨/夜四处标题日期有误: 会话实际发生在 2026-11-09 (凌晨 03:07 构建、晨侦察、夜落地, 文件系统时间戳与系统时钟为证), 已统一修正为 11-09。
+## 2026-11-10 凌晨: 满水洞穴穿面修复, 配置归拢, 种子/数据包两案定罪
+
+- 修复: 满水封闭洞穴 carve 全程零空气写入, 壳 (只拦空气) 全程旁观照样穿面 -> 谓词扩为空气或流体一并拒 (getFluidState 非空), 壳带内保持原地形; 高洞遇潜水面留石盖封水, javadoc 与 properties 注释同步。
+- 配置: properties 迁入 config/terrain-diffusion-mc/ 子目录 (与 carver_altitudes.json 同居), 首启自动从 config 根搬入, 已调值不丢。
+- 种子案定罪: init(world.getSeed()) 在 TerrainDiffusionLifecycle.onWorldLoad 接线正常, 接口层吃 world seed; 但 setSeed 只重建合成图工厂 (气候/群系噪声 per-seed), 主地形 elevation 由 ONNX 从 latent 解码, latent 若不吃 seed 则同坐标同山 -- 与实测地形复现 (冰湖指纹) 吻合, 山复现/群系变化分裂在此线上。属上游架构问题, 修复 (latent 掺 seed) 待 max 拍板。
+- 数据包损坏案: new TerrainDiffusionBiomeSource 全仓零命中, "运行时 new"假说排除; 高置信新假说 = 注册表按对象身份反查 codec, 而 MapCodec.codec() 每次调用返回新包装实例, 注册实例与保存时 codec() 返回实例身份不等 -> Unknown registry element。修复方向 = Codec 单例化 (static final, 注册与 codec() 同一对象), DFU 反查机制约七成把握, 动手前需反编译验证或建世界实测存读。
