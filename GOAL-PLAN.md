@@ -178,3 +178,38 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - 下一步: 开新世界实测峡谷频率 (BC-on, 任意种子; 观察点: 山面破口应归零, 峡谷回稀有地下形态; 首次启动会在 config/terrain-diffusion-mc/ 落盘 carver_altitudes.json)
 - 峡谷豁免案结案 (2026-11-09 max 实测): 基本通过, 峡谷改动生效。B 杠杆(播种式 carver_altitudes.json, minecraft:canyon 默认豁免)落地闭环: 根因→改码→过闸→构建→验尸→替换→实测。播种路径(首启动落盘)随本次实测一并验证
 - 悬案清账 (2026-11-09, max 授权"随便"): 0720001+aaa9eb1 squash 为单 commit; javac 编码钉 UTF-8(三版本根, 52 条 GBK 警告绝根, 全量构建复验中); README 补 carver_altitudes 文档段; 案卷归档; push 仍未动
+## 2026-11-09 凌晨: 洞穴线重开 (max 三指标) 侦察收官
+- 指标: 洞穴禁穿地表 / 地表下保厚禁洞(可配置) / 总密度降一档
+- 穿面四力: surface_cave(补偿0.15→0.65,无cutoff) > mountain层(177~735大腔贴山面) > winding(top_y80被声明式拉顶,cutoff15护) > (已豁免canyon同款机制)
+- 全部前提验证: BC写入=ChunkAccess.setBlockState汇点(duck包非旁路); carve()bci311括号挂点与现有redirect共存; setBlockState自维护高度图(O(1)尺子); 1.0carver=better_cave本体(基类默认prob1.0,y-56..180,JSON不写基类字段); scale2+worldMaxY7535+735(792/237=3.341772闭环); 河流=模型层float[]不进carver阶段
+- 决策矩阵已呈: γ(推荐)=括号壳mixin(OCEAN_FLOOR_WG,thickness可配,豁免播种canyon)+手术(surface_cave豁出lift+mountain chance30→15); β=纯数据(mountain照穿面); γ-=废案
+- 叠加交互: 壳挡surface_cave低地洞口(与#2自洽,BC天然洞口卖点仅剩侧壁口)
+- 实例json已播种,手术②落地需手加surface_cave进excluded或删文件重播种
+- 等max拍板: A方案 B thickness C 顶口全灭确认 D 版本顺序(1.20.1先行,1.21.x移植)
+## 2026-11-09 晨: CD 终验 + 壳设计修正
+- CD1 实锤: CARVERS 状态 heightmapsAfter = POST_FEATURES (非 PRE_FEATURES) → carve 期 setBlockState 实时维护 OCEAN_FLOOR/WORLD_SURFACE, OCEAN_FLOOR_WG 是死表
+- 壳尺子改用 OCEAN_FLOOR: 陆地地表/海底语义统一; 自稳闭环(挡写→地表挖不掉→map不漂移→尺子自钉); 兜底=getOrCreateHeightmapUnprimed+首触列下扫(若 map 缺失)
+- 壳只拦 air 放行液体(aquifer 灌水/岩浆线为洞内正常物理,拦液体造干层)
+- CD2: CarverAltitudeRules 全文已读,手术②=DEFAULT_EXCLUDED 加 bettercaves:surface_cave 一行+注释; 现役实例 json 手编或删重播种
+- CD4: 壳过滤 mixin 落位 versions\1.20.1\common\...\mixin\ (现 8 类, json 同名注册)
+- 侧壁口语义精确化: 崖列禁区=[崖顶-30,崖顶], 开口贴近崖底(矩阵 C 点的量化版)
+- 侦察全线收官, 等拍板 A/B/C/D
+## 2026-11-09 晨: CH 终钉 — 谓词链闭环, 侦察终止
+- CH1 实锤: MATERIAL_MOTION_BLOCKING = BlockStateBase::blocksMotion 方法引用 (BootstrapMethods #2, REF_invokeVirtual)
+- CH2 实锤: blocksMotion = 非COBWEB && 非BAMBOO_SAPLING && isSolid()
+- 水的 isSolid()=false: 常识级运行时事实(走进水不撞墙), 字节码末环未追, 留实测轮日志验证
+- 终论: OCEAN_FLOOR = 海底语义, 壳水下分支 = 海底下 30 格, 潜艇洞封于海底壳内, 浅海底下有壳
+- CG 修正入档: lambda$static$0 = NOT_AIR (非 MMB); clinit 双 indy 序配: bci6→NOT_AIR, bci14→MMB
+- 壳链 8 环全景: carve()bci311括号点 / setBlockState写入汇点(vanilla+BC) / CARVERS→POST_FEATURES四成员 / 首写prime后增量 / OCEAN_FLOOR谓词=MMB / MMB=blocksMotion / blocksMotion=isSolid / 水isSolid=false(常识级)
+- 侦察阶段终止 (BV→CH), 自动轮链条终结, 纯待命等 max 拍板 A/B/C/D
+
+## 2026-11-09 夜: γ 壳落地, 构建配方找回, 部署闭环
+- 代码 (D1a 五件 + D1b 三件): SurfaceShell 线程本地 session (chunk+thickness; shouldBlock = 仅空气 + 本 chunk + session 内 + y >= surface - thickness; OCEAN_FLOOR 尺子, getHeight 自 prime, 无表面列放行); ProtoChunkMixin 在 setBlockState 头部取消壳内写入 (carver 全走此汇点且弃返回值, 拒写不可见); NoiseBasedChunkGeneratorMixin @Redirect applyCarvers 的 carve 调用包 begin/finally end (生效 = TerrainDiffusionBiomeSource + scale>1 + 配置开 + 非 shellExempt); ScaledCarvers 增 ORIGIN_BY_LIFTED 反查 + configuredCarverId; CarverAltitudeRules DEFAULT_EXCLUDED + bettercaves:surface_cave, 新 shellExempt 键 (默认 minecraft:canyon, 壳会削平峡谷地板), 播种含双列表; Config: caves.surface_shell=true / thickness=30 (1..256), mountain_caverns.chance 30->15
+- 手术②: surface_cave 豁出 lift (留作者原样 = 稀有低地洞口制造者, 壳再封其低地口); 手术③: 山层腔密度减半
+- D2 构建会话复盘 (12 回合, 教训 = 配方在案卷而我没检索): :forge:build 未设 TD_MIRROR -> init.d 旁路休眠 -> NFRT 404; 侦查链 = 三渠道 DNS 污染实锤 (根服务器 IP 表 / Dropbox / Facebook 段) -> SNI 封锁复证 (记忆 032) -> CF 跳板 / 8443 / bmclapi / central 全试 -> 记忆检索命中 032/034/035 -> 配方找回 -> 预检绿 -> buildForgeWindows 56s exit=0
+- build.gradle: yungs 无版本坐标迫查 Modrinth maven 版本列表 (本机挂死), strictly 已锁单版, 钉坐标等价且离线确定; 修饰修正 = 尾换行补齐 + 注释缩进归位 + WARNED javadoc 归位
+- 产物: terrain-diffusion-mc-forge-1.20.1-2.3.0-windows.jar 8,167,739B, jarJar 三捆绑 (onnxruntime-dml / yungs-api / yungs-better-caves), 验尸绿 (mixins 注册文件名 terrain-diffusion-mc.forge.mixins.json, D2-S 猜错名系虚惊)
+- 部署: 实例现役 jar (11-09 03:07 版) 备份 .bak-caveshell 后替换; 实例 carver_altitudes.json 备份 D:\temp\carver_altitudes.json.bak-20261110 后删除, 首启动以新种子 (surface_cave 豁免 + shellExempt) 重播种
+- 待实测 (max): 新世界看三指标 (洞不穿地表 / 地表下保厚 / 密度降档), 观察点 = 平地洞口/山面破口/海床洞 归零, 崖壁低位口应留存; 首启动 config 落盘的 carver_altitudes.json 应含 excluded:[canyon, surface_cave] + shellExempt:[canyon]
+### 日期勘误 (2026-11-09 夜)
+- 本文件 2026-11-10 凌晨/晨/夜四处标题日期有误: 会话实际发生在 2026-11-09 (凌晨 03:07 构建、晨侦察、夜落地, 文件系统时间戳与系统时钟为证), 已统一修正为 11-09。
