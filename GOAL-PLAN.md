@@ -219,3 +219,8 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - 配置: properties 迁入 config/terrain-diffusion-mc/ 子目录 (与 carver_altitudes.json 同居), 首启自动从 config 根搬入, 已调值不丢。
 - 种子案定罪: init(world.getSeed()) 在 TerrainDiffusionLifecycle.onWorldLoad 接线正常, 接口层吃 world seed; 但 setSeed 只重建合成图工厂 (气候/群系噪声 per-seed), 主地形 elevation 由 ONNX 从 latent 解码, latent 若不吃 seed 则同坐标同山 -- 与实测地形复现 (冰湖指纹) 吻合, 山复现/群系变化分裂在此线上。属上游架构问题, 修复 (latent 掺 seed) 待 max 拍板。
 - 数据包损坏案: new TerrainDiffusionBiomeSource 全仓零命中, "运行时 new"假说排除; 高置信新假说 = 注册表按对象身份反查 codec, 而 MapCodec.codec() 每次调用返回新包装实例, 注册实例与保存时 codec() 返回实例身份不等 -> Unknown registry element。修复方向 = Codec 单例化 (static final, 注册与 codec() 同一对象), DFU 反查机制约七成把握, 动手前需反编译验证或建世界实测存读。
+## 2026-11-10: codec 单例修复 (max 批准), 种子案 B 立案 (latent 掺 seed)
+
+- codec 修复: TerrainDiffusionBiomeSource.CODEC_INSTANCE 静态单例, codec() 与注册点同用一对象; 根因 = 注册表身份反查 vs MapCodec.codec() 每次新实例 (长期记忆 047)。验证: 建世界进退重进, log 无 Unknown registry element 且 seed 非空。
+- 种子案 B (max 拍板, 必修): latent 构造链侦查在途 (生成点 / 缓存 key 是否带 seed / 随机源), 掺 seed 施工待链路清楚后进行。已知代价: 掺 seed 后换 seed 跨界区块有地形接缝, 已生成的区块不受影响。
+- DF 同病检查: TerrainDiffusionDensityFunction / NoiseCavesFlagDensityFunction 的 CODEC 模式侦查结果见 D5-U1 回执。

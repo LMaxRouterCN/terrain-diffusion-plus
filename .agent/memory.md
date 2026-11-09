@@ -152,7 +152,7 @@ tag: PowerShell, exec指令, 坑
 tag: 构建坑，网络环境，gh-cli，CI旁路，技巧
 <!-- END:034 -->
 <!-- ID:035 -->
-2026-11-07 09:25 td案构建大捷: terrain-diffusion-mc-forge-1.20.1-2.3.0-windows.jar (7.78MB) 构建成功 exit0, 产物@versions\1.20.1\forge\build\libs, 验尸全合格 (manifest/refmap/mixins/mods.toml/jarjar). 三墙三对策: ①maven.neoforged.net SNI死→init.d F:\MOVED\.gradle\init.d\td-mirror.init.gradle (TD_MIRROR env闸门零副作用) + TDMirror=D:\temp\td-maven (重版本化NFRT1.0.13+GMD CI生成minecraft-dependencies:1.20.1) ②HF吊销检查通道死 (证书真, curl --ssl-no-revoke 200)→hf-mirror替换 multiloader-loader.gradle L69+L88, 备份D:\temp\td-mll-backup.gradle ③PokerAgent屠后台进程→schtasks脱离进程树. 构建配方: D:\temp\td-build-run.bat (TD_MIRROR=1+GRADLE_USER_HOME=F:\MOVED\.gradle+JAVA_HOME=E:\Java\Zulu\zulu-17+TEMP=D:\temp, cd versions\1.20.1 跑根gradlew buildForgeWindows), 日志 td-b-out/err.log, 标记 td-b-exit.txt (0=成功). 长跑挂后台必用 schtasks, agent 框架杀不掉. 剩余: 实测8项 (远古城市/locate) + 桌面30分钟休眠bat已修 (AddMinutes(30)). git未commit (B1+timeout原则).
+[2026-11-09 夜] td案 γ壳版已部署: terrain-diffusion-mc-forge-1.20.1-2.3.0-windows.jar 8,167,740B 现役TEST实例(mods\), 回滚锚 .bak-caveshell; 三 commit: 76c364c 洞穴壳+手术(surface_cave豁出lift+mountain chance30→15) / 4b65be6 modrinth钉版本 / 案卷commit(含日期勘误,哈希以git log为准); 实例 carver_altitudes.json 已备份 D:\temp\carver_altitudes.json.bak-20261110 并删除, 首启动以新种子重播种(应含 excluded:[minecraft:canyon, bettercaves:surface_cave] + shellExempt:[minecraft:canyon])。**构建配方(两次救命,勿丢)**: 环境四件套 TD_MIRROR=1 + GRADLE_USER_HOME=F:\MOVED\.gradle + JAVA_HOME=E:\Java\Zulu\zulu-17 + TEMP/TMP=D:\temp, 任务名 buildForgeWindows; TD_MIRROR 激活 init.d\td-mirror.init.gradle(C盘活动home与F盘旧home双份同MD5): 摘 maven.neoforged.net 死仓 + 头插 D:\temp\td-maven 本地仓(NFRT 1.0.13 + minecraft-dependencies 1.20.1 全套22文件)。不设 TD_MIRROR → neoform-runtime 解析 404(maven.neoforged.net = GFW级SNI阻断, 见记忆032)。yungs 坐标已钉版本可离线。**教训: 开工先检索长期记忆/案卷**——11-09夜白绕12回合网络侦查, 配方一直躺在记忆035里。悬案: push 共9 commit(github直连死,待网络窗口), BC密度结论max欠, GOAL-PLAN历史日期勘误已amend。
 tag: td情报, terrain-diffusion-mc, 构建坑, 网络环境, 当前任务
 <!-- END:035 -->
 <!-- ID:036 -->
@@ -195,3 +195,15 @@ tag: terrain-diffusion-mc，td情报，坑
 [2026-11-09] td fork配置架构决策:carver_altitudes.json改为播种式(source of truth模式)——首运行把默认规则落盘成用户可编辑文件,之后只读文件,内置常量仅种子+坏文件内存兜底;坏文件绝不覆盖(保留用户手改,响亮报错)。max明确偏好:反运行时硬编码/反merge式"内置+文件合并",配置必须落盘可见可改,用户删行=功能关(后果自负)。旧BUILT_IN表+BUILT_IN_EXCLUDED+applyOverrides merge语义已删。语义变更:文件缺bettercaves条目=BC不被lift。通用教训:给max做任何"默认配置"一律走落盘播种,不走代码内常量参与运行时。此前判词:vanilla canyon被reach_summits+density_compensation误伤(p0.01→0.125~0.34,y顶拉穿天窗),豁免minecraft:canyon为种子默认。
 tag: td情报, terrain-diffusion-mc, 架构决策, 用户偏好
 <!-- END:044 -->
+<!-- ID:045 -->
+TD fork 构建配方 (2026-11-10 实证): buildForgeWindows 任务必须以 versions\1.20.1 为 cwd 跑, 在 fork 根下报 "Task not found"; gradlew.bat 用 fork 根的那份; 产物在 versions\1.20.1\forge\build\libs\。任务定义不在 vdir 顶层 *.gradle (grep 零命中, 疑在 applied script 或 buildSrc, 未追)。env 四件套: TD_MIRROR=1 / GRADLE_USER_HOME=F:\MOVED\.gradle / JAVA_HOME=E:\Java\Zulu\zulu-17 / TEMP=TMP=D:\temp。构建时长约 2.5 分钟。
+tag: 构建坑, terrain-diffusion-mc, buildForgeWindows
+<!-- END:045 -->
+<!-- ID:046 -->
+TD 种子架构 (2026-11-10 定罪): TerrainDiffusionLifecycle.onWorldLoad(OVERWORLD) → LocalTerrainProvider.init(world.getSeed()) 接线正常, 接口层吃 world seed。但 WorldPipeline.setSeed 作用半径 = 只重建 SyntheticMapFactory (气候/群系合成图噪声, per-seed); 主地形 elevation = ONNX 从 latent 解码, 该路径不吃 seed → 同坐标同地形。实测吻合: 新世界地形指纹 (冰湖等) 复现, 群系会变。explorer 的 /api/new_seed 同理只换合成图。注意: latent 构造链未逐行追 (判据 = setSeed 代码半径 + max 实测)。修复方向 (未批): latent 掺 seed, 需先追构造链, 属上游架构改动。
+tag: td情报, terrain-diffusion-mc, 种子
+<!-- END:046 -->
+<!-- ID:047 -->
+TD 数据包损坏案根因 (2026-11-10, 机制约 70% 把握): 保存时 PrimaryLevelData 报 "Unknown registry element in biome_source" → WorldGenSettings 编码失败 → level.dat 写残 (seed 陪葬) → 重进读档炸, 新建世界正常。机制: biome_source 注册表按对象身份存 codec, 保存时拿实例 codec() 反查 ID, 而 MapCodec.codec() 每次调用返回新包装实例 → 注册实例与反查实例身份不等 → 反查失败。new TerrainDiffusionBiomeSource 全仓零命中, "运行时 new" 假说已排除。修复 = CODEC 单例化 (static final, 注册与 codec() 返回同一对象), 三行改动; 若无效, 下一嫌疑 = RegistryOps 上下文错配。上游原版即有 (归档 log 2026-11-07-2 起 11 处实锤)。附赠修复: 存档可重进, level.dat 可存 seed (77-85 九世界空 seed 即此案所致)。
+tag: td情报, terrain-diffusion-mc, bug根因, 数据包损坏
+<!-- END:047 -->
