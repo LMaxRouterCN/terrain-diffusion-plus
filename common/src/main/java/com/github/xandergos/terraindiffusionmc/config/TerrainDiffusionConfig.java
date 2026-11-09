@@ -10,6 +10,8 @@ import java.util.Properties;
 
 public final class TerrainDiffusionConfig {
     private static final String FILE_NAME = "terrain-diffusion-mc.properties";
+    // [D4] properties 与 carver_altitudes.json 同住 config/terrain-diffusion-mc/ 子目录, 配置不再散落 config 根
+    private static final String CONFIG_DIR = "terrain-diffusion-mc";
     private static final String RESOURCE_PATH = "/" + FILE_NAME;
     private static final Properties PROPERTIES = new Properties();
     private static final String BUILD_VARIANT = readBuildVariant();
@@ -460,7 +462,7 @@ public final class TerrainDiffusionConfig {
     }
 
     /**
-     * Whether carvers carving above scale 1 are kept from writing air near the surface, so
+     * Whether carvers carving above scale 1 are kept from writing air or fluid near the surface, so
      * caves stay inside the terrain: no mouths on flat ground, no scars on summits, no holes
      * in the sea floor. Carvers under {@code shellExempt} in carver_altitudes.json are left
      * alone either way. No effect at world scale 1, where vanilla cave mouths belong.
@@ -563,9 +565,25 @@ public final class TerrainDiffusionConfig {
 
     private static Path resolveConfigPath() {
         try {
-            return PlatformPaths.configDir().resolve(FILE_NAME);
-        } catch (RuntimeException e) {
-            System.err.println("Loader config directory unavailable: " + e.getMessage());
+            // [D4] 配置住进 config/terrain-diffusion-mc/ 子目录, 与 carver_altitudes.json 同居;
+            // 旧版 (2.3.0 及之前) 文件躺在 config 根, 首次启动一次性搬入, 已调好的值不丢。
+            Path dir = PlatformPaths.configDir().resolve(CONFIG_DIR);
+            Path file = dir.resolve(FILE_NAME);
+            Path legacy = PlatformPaths.configDir().resolve(FILE_NAME);
+            if (!Files.exists(file)) {
+                Files.createDirectories(dir);
+                if (Files.exists(legacy)) {
+                    try {
+                        Files.move(legacy, file);
+                    } catch (IOException e) {
+                        // 搬不动就留着: 新路径照常播种, 旧文件原样保留, 已调值可手动找回
+                        System.err.println("Legacy config migration failed: " + e.getMessage());
+                    }
+                }
+            }
+            return file;
+        } catch (RuntimeException | IOException e) {
+            System.err.println("Config directory unavailable or legacy migration failed: " + e.getMessage());
             return null;
         }
     }
