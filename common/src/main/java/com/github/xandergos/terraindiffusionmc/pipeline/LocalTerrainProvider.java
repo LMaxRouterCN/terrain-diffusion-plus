@@ -276,7 +276,8 @@ public final class LocalTerrainProvider {
     private final HydrologyProvider hydrologyProvider;
     private final CoarseDrainageProvider coarseDrainageProvider;
 
-    private static final Object INIT_LOCK = new Object();
+    // [seed案修复 2026-11-12] INIT_LOCK 已删: init(static synchronized=类锁)与 getInstance 曾各持一把锁,
+    // 两线程可同时通过 INSTANCE null 检查并行构建 LTP, 后完成者无条件覆盖; getInstance 后写时 0L 覆盖真种子, 新世界整场 seed-0。
 
     private LocalTerrainProvider(long seed, PipelineModels models) {
         this.pipeline = new WorldPipeline(seed, models);
@@ -325,7 +326,7 @@ public final class LocalTerrainProvider {
     public static LocalTerrainProvider getInstance() {
         if (INSTANCE != null) return INSTANCE;
 
-        synchronized(INIT_LOCK) {
+        synchronized (LocalTerrainProvider.class) { // [seed案修复] 与 init 同用类锁: 串行化两入口, 根除竞速后写覆盖
             if (INSTANCE != null) return INSTANCE;
             PipelineModels.awaitLoad();
             PipelineModels models = PipelineModels.getInstance();
