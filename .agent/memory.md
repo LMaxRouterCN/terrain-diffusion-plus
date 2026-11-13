@@ -292,3 +292,11 @@ tag: td情报，terrain-diffusion-mc，地底河，液面，bug根因
 2026-11-14 td fork git拓扑实况: origin=https://github.com/LMaxRouterCN/terrain-diffusion-plus.git(max自己的公开fork,push目标), upstream=https://github.com/derekvawdrey/terrain-diffusion-plus(直接上游), xandergos(源头作者)无remote仅历史链路。工作分支=LMax-master(GOAL-PLAN§5曾记branch=1.20.1+forge系备忘录060规范,从未落地,悬而未决)。.agent/(agent记忆目录)被git追踪且已公开在origin远端(2026-11-14确认:9-commit债清零那次push已带案卷commits如f1aeda5),属max知情既定实践;若撤需动历史或前向gitignore。.agent_trash/__external__=2026-11-10 DH评估案detprobe脚本残留(dll_diag.py/tdh_autopsy.py),未追踪无害。
 tag: td情报，terrain-diffusion-mc，fork同步
 <!-- END:066 -->
+<!-- ID:067 -->
+2026-11-14 v2 (JOIN-TEST 补证): PokerAgent exec 通道对换行的破坏比初判更深 — 行尾 "-join $crlf" 被吞后数组按 $OFS 空格连成单行 (b7e93bc 僵尸根因, commit 每文件恰 2 insertions 铁证); 且 char-code 构造 CRLF 的诊断输出经通道后仍显示空格连接 (type=String 但无换行), 连 [string][char]13+[string][char]10 拼接都不可全信。可靠写法收敛为一条: 多行内容一律 here-string @'...'@ 模板 ({{TOKEN}} 占位替换缩进/前缀), 写入后必须结构断言 (关键代码行独立成行, 注释标记与代码不得同行) 再 commit。纯字符串数组与 here-string 实证可靠 (D:\temp 清理 82/82, 探针 bat 多行跑通, $pinTpl 修复块全绿)。
+tag: PokerAgent，坑，指令格式，技巧
+<!-- END:067 -->
+<!-- ID:068 -->
+2026-11-14 td fork javadoc GBK 警告案结案 (通用构建坑): Gradle 多模块只给 JavaCompile 钉 UTF-8 不够 — Javadoc 任务有独立 encoding (未钉 = 平台默认, 中文 Windows = GBK), javadoc tool 按 GBK 读 UTF-8 源产 unmappable 警告; 即使 javadocJar SKIPPED, :forge:javadoc 任务照样执行照样报警 (在 build 依赖链上)。修法 = tasks.withType(Javadoc).configureEach 三键同钉: options.encoding + options.docEncoding + options.charSet = 'UTF-8' (源读取/HTML 输出/meta charset)。诊断手法: ①init script 探针 taskGraph.whenReady dump 全任务 encoding (--dry-run 只读); ②负对照 = 保留坏状态 --rerun 复现警告计数。落地: b5f722d (conventions + 三版本 4 文件), 负对照 100 条 → 复验 0 条。
+tag: 构建坑，gradle，javadoc
+<!-- END:068 -->
