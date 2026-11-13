@@ -1,9 +1,11 @@
 package com.github.xandergos.terraindiffusionmc;
 
+import com.github.xandergos.terraindiffusionmc.pack.BetterCavesEmbeddedPack;
 import com.github.xandergos.terraindiffusionmc.platform.PlatformMods;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -26,6 +28,7 @@ public class TerrainDiffusionMc {
         LOG.info("Initializing terrain-diffusion-mc for Forge");
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::onRegister);
+        modEventBus.addListener(this::onAddPackFinders); // [地底河案] APFE 注册内嵌 BC 数据包
         PlatformMods.configure(() -> net.minecraftforge.fml.ModList.get().getMods().stream()
                 .map(net.minecraftforge.forgespi.language.IModInfo::getModId)
                 .toList());
@@ -42,6 +45,11 @@ public class TerrainDiffusionMc {
                 TerrainDiffusionLifecycle.registerBiomeSourceCodecs(helper::register));
         event.register(Registries.DENSITY_FUNCTION_TYPE, helper ->
                 TerrainDiffusionLifecycle.registerDensityFunctionCodecs(helper::register));
+    }
+
+    // [地底河案] Forge 数据包注册事件 (IModBusEvent): 事件通道必压模组包
+    private void onAddPackFinders(AddPackFindersEvent event) {
+        BetterCavesEmbeddedPack.register(event);
     }
 
     private void onServerStarting(ServerStartingEvent event) {
