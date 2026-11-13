@@ -12,10 +12,8 @@ tag: 待办文件, 备忘录路径
 <!-- END:003 -->
 <!-- ID:004 -->
 2026-10-18 02:17 审查结论: 爆炸效果重写与大火燃烧重构在本地为纯绿地项目, mcmod全部项目过目加全盘检索AppliedCannon零命中, 无任何现有代码。可行性报告落盘于 D:\Documents\my\日常\爆炸大火-可行性审查\爆炸与大火-可行性审查报告.md。核心: 爆炸=射线改体积场, ExplosionEvent.Start取消加getToBlow填充, 零mixin, 中等难度, 建议先行; 大火=燃烧管线, 架构决策留给max: chunk级SavedData燃烧图(推荐) 对比 每方块BE, 中高难度; 两项目共享分帧调度器基建。许可证MPL-2.0, Forge 1.20.1。
-
 环境事实: max真实桌面路径为 D:\Desktop 而非C盘用户目录下Desktop; 后端终端为PowerShell。
-
-bug待max定夺: D:\Desktop\30分钟后休眠.bat 实际注册+2小时计划任务AutoHibernate2h, 窗口内30分钟倒计时纯装饰不触发任何动作, 疑似从2小时版复制漏改AddHours(2)。修复点: AddHours改AddMinutes(30), 或直接用桌面现成2小时版。已验证休眠时刻04:16:43。
+[2026-11-10 更正] 桌面"30分钟后休眠.bat"现为正常30分钟版: 触发器 AddMinutes(30) 已实锤(全文复读), 早前"AddHours(2)漏改"报告过时(10-18当天或之后已被修正)。残留: 计划任务名仍叫 AutoHibernate2h(纯名字无功能影响, 取消=桌面"取消休眠.bat")。等效执行: Register-ScheduledTask -TaskName AutoHibernate2h -Action (New-ScheduledTaskAction shutdown.exe /h) -Trigger (Once -At (Get-Date).AddMinutes(30)) -Force。桌面bat一览: 2小时后休眠/2小时休眠/30分钟后休眠/结束所有进程/取消休眠/杀edge/杀filec/杀QQ/重启EarTrumpet。
 tag: 爆炸, 大火, 绿地项目, 可行性审查, 桌面路径, 休眠bat
 <!-- END:004 -->
 <!-- ID:005 -->
@@ -152,7 +150,7 @@ tag: PowerShell, exec指令, 坑
 tag: 构建坑，网络环境，gh-cli，CI旁路，技巧
 <!-- END:034 -->
 <!-- ID:035 -->
-[2026-11-09 夜] td案 γ壳版已部署: terrain-diffusion-mc-forge-1.20.1-2.3.0-windows.jar 8,167,740B 现役TEST实例(mods\), 回滚锚 .bak-caveshell; 三 commit: 76c364c 洞穴壳+手术(surface_cave豁出lift+mountain chance30→15) / 4b65be6 modrinth钉版本 / 案卷commit(含日期勘误,哈希以git log为准); 实例 carver_altitudes.json 已备份 D:\temp\carver_altitudes.json.bak-20261110 并删除, 首启动以新种子重播种(应含 excluded:[minecraft:canyon, bettercaves:surface_cave] + shellExempt:[minecraft:canyon])。**构建配方(两次救命,勿丢)**: 环境四件套 TD_MIRROR=1 + GRADLE_USER_HOME=F:\MOVED\.gradle + JAVA_HOME=E:\Java\Zulu\zulu-17 + TEMP/TMP=D:\temp, 任务名 buildForgeWindows; TD_MIRROR 激活 init.d\td-mirror.init.gradle(C盘活动home与F盘旧home双份同MD5): 摘 maven.neoforged.net 死仓 + 头插 D:\temp\td-maven 本地仓(NFRT 1.0.13 + minecraft-dependencies 1.20.1 全套22文件)。不设 TD_MIRROR → neoform-runtime 解析 404(maven.neoforged.net = GFW级SNI阻断, 见记忆032)。yungs 坐标已钉版本可离线。**教训: 开工先检索长期记忆/案卷**——11-09夜白绕12回合网络侦查, 配方一直躺在记忆035里。悬案: push 共9 commit(github直连死,待网络窗口), BC密度结论max欠, GOAL-PLAN历史日期勘误已amend。
+[2026-11-09 夜] td案 γ壳版已部署: terrain-diffusion-mc-forge-1.20.1-2.3.0-windows.jar 8,167,740B 现役TEST实例(mods\), 回滚锚 .bak-caveshell; 三 commit: 76c364c 洞穴壳+手术(surface_cave豁出lift+mountain chance30→15) / 4b65be6 modrinth钉版本 / 案卷commit(含日期勘误,哈希以git log为准); 实例 carver_altitudes.json 已备份 D:\temp\carver_altitudes.json.bak-20261110 并删除, 首启动以新种子重播种(应含 excluded:[minecraft:canyon, bettercaves:surface_cave] + shellExempt:[minecraft:canyon])。**构建配方(两次救命,勿丢)**: 环境四件套 TD_MIRROR=1 + GRADLE_USER_HOME=F:\MOVED\.gradle + JAVA_HOME=E:\Java\Zulu\zulu-17 + TEMP/TMP=D:\temp, 任务名 buildForgeWindows; TD_MIRROR 激活 init.d\td-mirror.init.gradle(C盘活动home与F盘旧home双份同MD5): 摘 maven.neoforged.net 死仓 + 头插 D:\temp\td-maven 本地仓(NFRT 1.0.13 + minecraft-dependencies 1.20.1 全套22文件)。不设 TD_MIRROR → neoform-runtime 解析 404(maven.neoforged.net = GFW级SNI阻断, 见记忆032)。yungs 坐标已钉版本可离线。**教训: 开工先检索长期记忆/案卷**——11-09夜白绕12回合网络侦查, 配方一直躺在记忆035里。[2026-11-10 更新] push 悬案销: github 直连已恢复, 07:02 push 成功(b536576); 输出 7d004d9..b536576 = 仅推新 commit, 此前 pending 的 9 commit 已在远端(何时推上未观察到,某次网络窗口已成功), commit 债清零。BC密度已落地(cave_spawn_chance 100→70, 见记忆042), 该悬案销。GOAL-PLAN 日期勘误维持已 amend。
 tag: td情报, terrain-diffusion-mc, 构建坑, 网络环境, 当前任务
 <!-- END:035 -->
 <!-- ID:036 -->
@@ -180,8 +178,8 @@ TD fork 测试实例: E:\MC\.minecraft\versions\TEST 1.20.1-Forge_47.4.10 (1.20.
 tag: 测试环境, Minecraft
 <!-- END:041 -->
 <!-- ID:042 -->
-TD洞穴体系关键结构(2026-11-08):mod jar-in-jar捆YUNG's Better Caves 2.0.6(默认开,properties键caves.bundled_cave_mod);caves.noise_caves=auto语义=BC在场且启用→mod自己的噪声洞穴(cave_density.json整套)关闭→BC在场时cave_density是死配置,改它无效。作者捆绑BC+auto=明确选择洞穴方案信BC。max最终决策:不关BC,走BC实例层调参(零mod侵入);cave_density修改计划撤下。max实测:BC摘除(bundled_cave_mod=false)机器能跑不崩。新bug案:世界最底层岩浆河无视基岩,基岩被捏成河床形状且捅穿,穿河面即虚空,疑似基岩渐变层(vertical_gradient -60→-55随机壳)被carver挖空上覆stone后成筛子+carver lavaLevel拉伸越界或aquifer lava。noise_settings: min_y=-64,height=2032,dimension_type min_y=-64/height=800(不一致但能跑),sea_level 63,aquifers_enabled=true,bedrock_floor渐变-60/-55。实例config在versions\TEST 1.20.1-Forge_47.4.10\config\隔离(PCL实例)。
-tag: td情报, terrain-diffusion-mc, Minecraft, bug根因
+TD洞穴体系关键结构(2026-11-08):mod jar-in-jar捆YUNG's Better Caves 2.0.6(默认开,properties键caves.bundled_cave_mod);caves.noise_caves=auto语义=BC在场且启用→mod自己的噪声洞穴(cave_density.json整套)关闭→BC在场时cave_density是死配置,改它无效。max最终决策:不关BC,走BC实例层调参(零mod侵入);max实测:BC摘除(bundled_cave_mod=false)机器能跑不崩。noise_settings: min_y=-64,height=2032,dimension_type min_y=-64/height=800(不一致但能跑),sea_level 63,aquifers_enabled=true,bedrock_floor渐变-60/-55。实例config在versions\TEST 1.20.1-Forge_47.4.10\config\隔离(PCL实例)。[2026-11-10 结案补充] BC形态实锤: 捆在TD主jar的META-INF/jarjar/yungs-better-caves-1.20.1-Forge-2.0.6.jar 405KB(+yungs-api 370KB+onnxruntime 6.8MB)。**坑: META-INF/jarjar/ 是Forge的jarJar路径, META-INF/jars/ 是Fabric的——grep错路径必扑空,踩了三轮**。BC主配置=jar内data-driven JSON(data/bettercaves/worldgen/configured_carver/better_cave.json),实例config\bettercaves\只放liquidregions等附加选项,主配置不落盘;覆盖法=OpenLoader数据包(实例已有OEIBF先例)。密度杠杆定案: cave_spawn_chance(区域级洞穴生成率,默认100.0=每区域必出洞="任意处5x5竖井必遇洞"根因)是唯一干净旋钮——BC主carver概率已1.0,TD密度补偿(×3.34封顶)对它无效,vanilla probability字段是死旋钮。落地: config\openloader\data\z-bc-cave-density\包,100→70(-30%),仅新世界生效; cavern(23)与surface_cave(0.15→被TD补偿至0.5)未动。BC经biome_modifier(add_carvers/remove_carvers)挂is_overworld全群系,carver重建走BetterCavesWorldCarverConfig codec,datapack覆盖应生效,BCConfigForge运行时覆盖风险低。
+tag: td情报, terrain-diffusion-mc, Minecraft, bug根因, 坑
 <!-- END:042 -->
 <!-- ID:043 -->
 [2026-11-08] terrain-diffusion-mc 四案判词浓缩(全案详见fork仓库GOAL-PLAN.md及C3/C4 commit):
@@ -200,10 +198,97 @@ TD fork 构建配方 (2026-11-10 实证): buildForgeWindows 任务必须以 vers
 tag: 构建坑, terrain-diffusion-mc, buildForgeWindows
 <!-- END:045 -->
 <!-- ID:046 -->
-TD 种子架构 (2026-11-10 D5-U1 侦查强化): 主地形链 = coarse(20步DPM-Solver++) → latent(2步flow-matching) → decoder; elevation 直接读 latents 平面4/5 (getLatentElevation, w=平面5, v=平面4/w, sign(v)*v*v 反归一)。**冒烟枪**: latent 初始噪声 (init_latent_map) 与步进 (step_latent_map_0) 传硬编码常数 5819/5820 进 latentBatch, 非管线种子 → 地基噪声跨种子恒同 (函数体 D5-U2 确认中)。SyntheticMapFactory(seed) per-seed 噪声通道 0..4 + seed 无关 WorldClim 分位数, 喂 coarse → 种子只走条件路径 (摇动群系/气候, 摇不动地形, 与 max 实测"群系变山不变"吻合)。WorldPipeline ctor: seed 存储 + syntheticMapFactory(seed) + MemoryTileStore(纯内存) + 三阶段构建; LocalTerrainProvider.init(world.getSeed()) 接线正常 (Lifecycle L115)。种子案 B (max 已批必修): 固定常数改种子派生 (5819/5820 + coarse/decoder 阶段同款常数待 D5-U2 找齐); **磁盘缓存雷**: hydrology/coarse_drainage disk_cache namespace 默认"default"疑不含种子, 换种子重访旧区可能读旧种子的盘缓存, key 构造核实中, 修 B 时需自动掺种子。
+TD 种子架构 (2026-11-10 D5-U4 实测二次反转后修正): 管线随机源全链条吃 seed (coarse L195 seed / L211 seed+1, latent seed+5819/5820, decoder seed+5819, 均为管线seed+用途偏移, 接线本身健康)。**2026-11-10 04:1x max 实测: codec 修复后存读不崩 (codec 案结案), 但新世界地形+出生点与旧世界全同 → "level.dat 写残致 seed 复用/两案合并"结论被实测推翻, 种子案独立重开**。铁证: 地形+spawn 全同 = pipeline 眼中 seed 恒定。分水岭 = max 对两个世界各输 /seed 对报 (seed 同=创建侧, seed 异=传递链断)。新嫌疑: ①两世界 seed 本就相同 ②pipeline 构造时 seed 来源 (biome source ctor?) ③init/setSeed 触发时机晚于地形/spawn 计算 ④静态单例不随世界重建 ⑤config 固定 seed 项。**新雷: fork 根下 common/ 与 versions\1.20.1\common/ 双源码副本, 构建用后者, D5-U1/U2 侦查读的是前者, 同步性 D5-U4 hash 钉死中**。磁盘缓存 TileKey 含 seed 无污染 (此结论不受影响)。
 tag: td情报, terrain-diffusion-mc, 种子
 <!-- END:046 -->
 <!-- ID:047 -->
 TD 数据包损坏案根因 (2026-11-10, 机制约 70% 把握): 保存时 PrimaryLevelData 报 "Unknown registry element in biome_source" → WorldGenSettings 编码失败 → level.dat 写残 (seed 陪葬) → 重进读档炸, 新建世界正常。机制: biome_source 注册表按对象身份存 codec, 保存时拿实例 codec() 反查 ID, 而 MapCodec.codec() 每次调用返回新包装实例 → 注册实例与反查实例身份不等 → 反查失败。new TerrainDiffusionBiomeSource 全仓零命中, "运行时 new" 假说已排除。修复 = CODEC 单例化 (static final, 注册与 codec() 返回同一对象), 三行改动; 若无效, 下一嫌疑 = RegistryOps 上下文错配。上游原版即有 (归档 log 2026-11-07-2 起 11 处实锤)。附赠修复: 存档可重进, level.dat 可存 seed (77-85 九世界空 seed 即此案所致)。
 tag: td情报, terrain-diffusion-mc, bug根因, 数据包损坏
 <!-- END:047 -->
+<!-- ID:048 -->
+DH 加速 LOD 生成评估结论 (2026-11-10, 报告 D:\Documents\my\日常\DH加速LOD生成-可行性评估-2026-11-10.md): 可行。官方入口=DhApi.worldGenOverrides.registerWorldGeneratorOverride; 推荐路线=IDhApiWorldGenerator.generateLod+setApiDataPointColumn (非 chunk 抽象类); 数据点=DhApiTerrainDataPoint.create(detailLevel,blockLight,skyLight,bottomY,topY,blockStateWrapper,biomeWrapper); 尺度=TD 30m/px×scale2=60m/px vs DH detail6=64blocks/列, 插值吸收。最大风险=wrapper 实例获取无公开工厂(兜底: 反射 core BlockStateWrapper 工厂钉死 2.3.2-b / DhApiBlockStateWrapperCreatedEvent 拦截); 次风险=DH 2.3.2-b beta API 易变→compileOnly 软依赖+在场检测注册(TerraBlenderSurfaceCompat 先例)。联机拓扑=DH 生成在客户端, 模型 2GB 在服务端→单机先行联机二期。工时典型 2-4 天最坏 1 周。模块边界: TdLodTranslator 纯翻译/TdDhGenerator 壳/DhCompat 注册/配置落盘播种。待 max 决策: 做不做/范围/依赖策略。
+tag: td情报, terrain-diffusion-mc, 可行性审查, DH
+<!-- END:048 -->
+<!-- ID:049 -->
+[2026-11-10] Windows loader 模块身份=基名(非路径): 进程内已有同名DLL时, LoadLibrary/System.load 传任意绝对路径都只会返回已加载的那个模块。"预载System32新版VC++再加载目标DLL"这类实验天然作废——JDK bin里捆绑的VC++运行时(如Zulu17的14.29)在JVM启动时就随JVM的DLL入进程, 之后无法替换。实战: ORT-DML 1.26 的 onnxruntime.dll 在 Zulu17 下 System.load 报1114(初始化例程失败), 同一DLL文件 python(无捆绑CRT走System32 14.51)加载成功; Zulu17 preload System32 CRT 后依旧1114(preload拿回的是旧模块)。调试这类问题的正解=换不同JVM做矩阵测试, 而非进程内 preload。CRT遮蔽链(Zulu17 bin 14.29 → 静默遮蔽 System32 14.51)为当时主嫌, 矩阵验证中。
+tag: 坑, Windows, DLL, terrain-diffusion-mc, bug根因
+<!-- END:049 -->
+<!-- ID:050 -->
+[2026-11-10] ORT-DML 1.26 (onnxruntime.dll FileVersion 1.26.0) 在 Windows 各 JVM 下 System.load 报 1114 的实证矩阵: JDK bin 捆绑 VC++ CRT ≥14.40 → PASS (zulu214219=21.0.7, zulu-25, VSCode redhat JRE25); bin 捆绑 14.29/14.31 → UnsatisfiedLinkError 1114 初始化例程失败 (zulu-17=17.0.12, Oracle jdk-21=21.0.2, zulu21=21.0.4)。机制=应用目录(java.home\bin)在 DLL 搜索序第一位, 旧 CRT 遮蔽 System32 的 14.51; 注: 缺入口理论上应报 126/127 而实测 1114, 精确机制未深究, 版本相关性为实证结论。max 的游戏(PCL)实际用 E:\Java\zulu214219 (latest.log "java version 21.0.7 by Azul Systems") 所以从没炸过。**mod 兼容性影响: terrain-diffusion-mc 用户用捆绑旧 CRT 的 JDK 启动会直接 UnsatisfiedLinkError 1114, 建议写进 README 系统要求 + 崩溃时的友好提示**。另发现: E:\Java\jdk-17.0.14.7-hotspot 疑似 32 位安装(加载 64 位 DLL 报 "Can't load AMD 64-bit .dll on a IA 32-bit platform")。调试正解=换 JVM 矩阵测试, 进程内 preload System32 CRT 无效(模块身份=基名, 见记忆 049)。
+tag: 坑, Windows, DLL, terrain-diffusion-mc, bug根因, JVM, mod兼容
+<!-- END:050 -->
+<!-- ID:051 -->
+2026-11-11 td案取证教训(通用):①Minecraft轮转log时间戳格式为"日+月"(如11-08=0811月2026,11-10=1011月2026),跨多日扫描时禁止硬编码日期前缀,必须按目标日动态生成,否则静默0命中还误判"日志已轮转丢失";②mod的"Persisted ... to <路径>"日志行尾部含完整缓存路径(含seed-hex分目录),截断显示会永久遮蔽关键键值,涉路径行Cap用200+;③javap输出为2空格缩进,自写方法解析器勿按4空格匹配;④gradle缓存里vanilla反编译源不存在.java散文件,运行时版本jar(versions\<ver>\<ver>.jar)可直接javap取证Forge补丁后的真实字节码。
+tag: 坑, 日志分析, terrain-diffusion-mc
+<!-- END:051 -->
+<!-- ID:052 -->
+td案结案卷(2026-11-12):TD(Terrain Diffusion mod)种子丢失bug根因=LocalTerrainProvider双实例竞速。init(static synchronized类锁,LevelEvent.Load时刻,持真种子)与getInstance(独立INIT_LOCK,首批coarse调用者,Load+0.03~0.75s)各持一把锁互不互斥,两边都是查INSTANCE空→重量级构造器→无条件赋值;两线程并行构建LTP,后完成者覆盖先完成者:getInstance后写=0L覆盖live种子=新世界整场seed-0(指纹=加载飞快+spawn固定(-5120,69,5120)+24x24扩张);init后写=好场(else分支setSeed自愈+双批次指纹);重进必好(INSTANCE已在,else-if setSeed)。修复=getInstance锁改LocalTerrainProvider.class与init互斥(INSTANCE volatile,DCL安全),可回馈上游。九场铁证:坏场w83,w84,w85,(86),(90)全单批次;好首建w77,(87),(91)全双批次。seed hex:(86)坏c80ac7a0678ee9a0/(90)坏539eb6874ef9c574/(91)好8e9f8c97872ce0a0/(92)好6f27a29b076e1160/(87)好937c0cf8d4dc9ad8/(88)好8791516634639969/(89)好27106f412749fe46。悬案:重进会话coarse37+uncached54(DH LOD候选);(83)(84)(85)=codec测试世界全seed-0;codecfix=f58966e正常。环境:fork=D:\Documents\mcmod\LMaxs Terrain Diffusion fork;构建D:\temp\td-build-run.bat(TD_MIRROR=1);测试实例E:\MC\.minecraft\versions\TEST 1.20.1-Forge_47.4.10;probe=同实例mods\tdseedprobe-1.0.0.jar(源码D:\Documents\mcmod\td-seed-probe);部署jar=mods\terrain-diffusion-mc-forge-1.20.1-2.3.0-windows.jar。PokerAgent教训(2026-11-12):多行消息可能被通道剥换行→多行脚本压成单行注释空跑(回执=已执行无输出);单行exec内联会吃空格;remember/memory内联已弃用必须code块;稳妥姿势=exec单code块多行+消息短。
+tag: bug根因, Minecraft, td情报, terrain-diffusion-mc
+<!-- END:052 -->
+<!-- ID:053 -->
+[2026-11-12 03:35] td种子竞速案封卷。修复=cf6d44f(LocalTerrainProvider: getInstance与init统一类锁,INIT_LOCK字段删除),已部署TEST实例,备份D:\temp\td-jar-backup\pre-seedfix-1112-022114.jar。终审证据:max冷启动连建6新世界,6/6好:每场ServerStarted行chainSeed=levelGetSeed=instanceSeed=seed四值全等,零0值;W1 AboutToStart时INSTANCE=null(旧竞态窗口安全通过,getInstance排队进门见活实例);W2-6 AboutToStart时instanceSeed=旧值→ServerStarted收敛(init else分支setSeed自愈实锤);六场均~2分钟冷算(修复前坏场秒进)。两条交错支路(实例未建/实例旧种子)均被实测覆盖。修复前首建坏率62.5%,未修复6连好概率≈0.28%。probe=tdseedprobe-1.0.0.jar(源码D:\Documents\mcmod\td-seed-probe)。后续:上游PR待max点头。
+tag: terrain-diffusion-mc, td情报, bug根因，种子
+<!-- END:053 -->
+<!-- ID:054 -->
+2026-11-14 td深度案收线: max裁决"-128合理,收工"——原目标"洞穴不捅基岩/墙不可感知"闭环;设计哲学(max原话):"基岩是墙但正常游玩不应感知墙"。better_caves bottom_y维持-63(-127灌洞否决,深部内容全部延后)。延后backlog(重启时用): ①下界岩(基岩层附近少量)+岩浆河置新底 ②矿石边角:gold_lower成-64~-48悬空薄片(唯一遗留) ③洞带是否下扩bottom_y ④OEIBF包识别。世界生成链实锤: td零carver数据,carver实现内嵌td jar(bettercaves jar不在mods);OpenLoader包z-bc-cave-density喂better_cave.json(bottom_y=-63×2区域,top_y=80);td经NoiseBasedChunkGeneratorMixin@Redirect getCarvers→ScaledCarvers抬升外来carver。vanilla矿石锚点(1.20.1版本jar实测)劈两半: 跟随组above_bottom自动灌新深部=diamond/buried/large(-80~80→裁剪后-128~-48),redstone(底~15),redstone_lower(-32~32→裁剪后-128~-96),iron_small(底~72),lapis_buried(底~64);留守组absolute不动=gold(-64~32),gold_lower(-64~-48悬浮),lapis(-32~32),iron_middle(-24~56),copper(-16~112),emerald(-16~480)。深板岩矿变体由ore_feature自带deepslate target自动处理。未实锤: td biome→vanilla矿引用链(fork resources无biome目录,biome json疑在jar内或代码生成)。TEST实例jar已打-128补丁,备份D:\temp\td-jar-backup\pre-depthfix-1113-175954.jar,回退=回拷mods;fork三版本同步(1.20.1+1.21.1+1.21.11,Δ=64+基岩锚above_bottom化+ScaledCarvers L373注释)待max裁决。
+[2026-11-14 03:55修正,MD5+max证词] ①上述"TEST实例jar已打-128补丁"不成立: 063② MD5实证,11-14 02:59部署时刻 mods 活跃jar≡pre-depthfix备份→-128补丁当时不在mods;max表态不追究去向,事项封口。②"fork三版本同步待裁决"已由056作废(深度案全撤销,fork源码从未改)。③本条延后backlog(下界岩/岩浆新底/gold_lower/洞带下扩)随-128撤销作废,仅历史档;岩浆河唯一存活分支=地底河案water_region_spawn_chance调法(见058/064)。④当前世界生成态(液面-46/河床-52/密度100)以056/058/064为准。
+tag: td情报, terrain-diffusion-mc, 矿石锚点, 深度案, 延后清单
+<!-- END:054 -->
+<!-- ID:055 -->
+2026-11-14 洞穴带侦察收口:better_cave.json结构=2隧道(bottom_y=-63,top_y=80,y_compression 5.0/2.2)+2大空腔(-63..-18无底is_floored=false,-63..-28有底,cavern_spawn 23/region)+misc.replaceable=#minecraft:overworld_carver_replaceables。深度案原始病灶实锤:bottom_y=-63语义=旧底-64上方1格,旧基岩带-64..-55→洞带下沿9格嵌在基岩带内,carver啃不动基岩(不在replaceable标签)→洞底暴露基岩墙=当年"河贴基岩"根因。手术后基岩-124..-119,洞底-63悬空56格,"洞穴不碰基岩"当前已成立零改动达标。max指令"bottom_y高点"读作下扩灌新深部留缓冲,候选-110/-103/-96(缓冲9/16/24),倾向只动隧道L9/L32两处,cavern留-63;td properties L158实锤noise型carver自适应band。未实锤:旧世界地底河水源(aquifer vs BC自带液态逻辑)。bettercaves实现疑td捆绑注册(jar内路径无bettercaves字样,mods无其jar,但type=bettercaves:better_cave活体生效)。
+tag: td情报，terrain-diffusion-mc，深度案，洞穴，bug根因
+<!-- END:055 -->
+<!-- ID:056 -->
+2026-11-14终改:深度案全撤销——max明令"把-128改回去",TEST mods内td jar已回拷为原版(D:\temp\td-jar-backup\pre-depthfix-1113-175954.jar,MD5校验一致),-128补丁版归档同目录terrain-diffusion-2.3.0-depth128-patched.jar(撤销的撤销可用)。fork源码从未改动,三版本同步议题就此终结。世界终态:原生深度-64,基岩带-55~-64(max口径),洞穴底bottom_y=-48(better_cave.json 4处,原-63嵌基岩带9格=旧"河贴基岩"根因),洞底与墙间6格实心深板岩垫,top_y全部未动。深部白纸backlog(下界岩/岩浆河/gold_lower/洞带下扩)随-128撤销作废,仅剩历史档(054/055)。生效范围仅新区块,旧区块保持-128形状。
+tag: td情报，terrain-diffusion-mc，深度案，fork同步
+<!-- END:056 -->
+<!-- ID:057 -->
+2026-11-14沟通教训(修正版,前版"零改动读法优先"已被证伪作废):max的短句裁决按祈使句优先直译。"bottom_y高点,离基岩层远点"=把bottom_y抬高的动作指令,我连续三轮误读(维持-63不动→下扩灌新底抛-110/-103/-96→"描述现状句"),还把错误结论写成教训存档,根因=发明"现状自洽"解释覆盖字面义。新规则:字面像祈使就按祈使执行,与现状冲突也不自行折衷;"把X改回去"=撤销X的补丁回原状;"X完事"才是结案句;拿不准时一句话向max复述指令内容再动手,禁止三轮解读。
+tag: 用户偏好，沟通，坑
+<!-- END:057 -->
+<!-- ID:058 -->
+2026-11-14 地底河案结案(侦破+修复双闭环):根因=BC(嵌td jar JiJ内yungs-better-caves-1.20.1-Forge-2.0.6)液体系统Liquid Regions,液面默认-55(基岩顶),旧世界bottom_y-63洞底8格淹水贴墙,新bottom_y高于液面洞全干河消失。液体系统全配置=config\bettercaves\forge-1_20_1\liquidregions.json三钮(独立于carver json/td properties,td不碰):①liquid_altitude水岩共用液面绝对Y零校验②water_region_spawn_chance水区份额%(校验[0,100]fail-soft,岩浆吃补集)③liquid_region_size区域波长(0.001=千格级)。极性实锤:srg_to_official_1.20.1.tsrg f_49990_=WATER f_49991_=LAVA;getLiquidBlockAtPos三态逐列:水<阈值-jitter/岩浆>阈值+jitter/null过渡带~5%水岩隔离。C档已执行且max目视验收通过(11-14凌晨):液面-46+bottom_y-52×4,终态水深6/墙垫2,生效新区块,BC加载零报错。备份链D:\temp\td-jar-backup:liquidregions.json.orig-55.bak+better_cave.json.bottom-48.bak+better_cave.json.bottom-63.bak。岩浆河调法=chance 40→15(未动,等max指示)。后续任务(进行中):把-46/-52固化进td mod分发默认——bottom_y已在z-bc-cave-density数据包(分发友好),液面在config侧需查BC jar内有无内嵌默认json(有→gradle构建时替换JiJ内BC文件;无→mixin/写config/fork BC三选)。测试环境:E:\MC\.minecraft\versions\TEST 1.20.1-Forge_47.4.10。
+tag: td情报，terrain-diffusion-mc，深度案，地底河，液面，bug根因
+<!-- END:058 -->
+<!-- ID:059 -->
+2026-11-14 Forge模组jar数据包机制(通用事实):模组jar内data/(assets/)目录本身就是自动常驻全局数据包/资源包,无需OpenLoader、无需建世界挂载、无需pack.mcmeta(Forge的ModFilePackResources内置处理,文件夹包才需要mcmeta)。硬门槛:jar必须是合法mod(mods.toml齐全),裸data/ jar扔mods目录会被跳过;壳mod(mods.toml几行+data/,1KB级)是集成包生态标准件;改第三方jar塞data是脏路(更新冲掉+版本链污染),正确姿势=塞自家mod。覆盖优先级:事件注册包(AddPackFindersEvent)>模组包>原版;模组包之间同路径优先级未实测。OpenLoader唯一残值=玩家拖文件夹+热改免重打包,对mod作者零价值。BC jar自带data/bettercaves/worldgen/configured_carver/better_cave.json即此机制实证。
+tag: Minecraft, 技巧, td情报, terrain-diffusion-mc
+<!-- END:059 -->
+<!-- ID:060 -->
+max的fork模组版本号规范(2026-11-14,源:备忘录mc模组规范段,路径见记忆003):两段式[原作版本号去点].[我的版本号],例1124.2=emi原作1.1.24+自己.2;原作大版本更新→我的小版本重置回.1;我的段正常三段式1.0.0,用不上可一位(230.1)。td fork 2026-11-14发布=230.1.1.0(原作td2.3.0+自己1.1.0)。fork与原作差异大(重写/新功能占比高/原作长期停更)→可去掉原作段。release tag=版本号。通用jar名:模组名-模组版本号+mc版本+加载器-编译时间戳.jar(例lmaxs-emi-fork-1124.2+1.20.1+forge-20260928235749.jar)。branch=mc版本+加载器(多加载器取mc版本,stonecutter取main)。fork命名LMaxs X fork(保留原作名,继任者不必保留此段)。命名空间com/lmaxrouter优先。新增物品→创造标签页单开一页。更新日志只写增量。主控配置文件一站式(依赖/mods.toml内容链入)。
+tag: 用户偏好, 版本号规范, fork规范, mc模组, 备忘录
+<!-- END:060 -->
+<!-- ID:061 -->
+2026-11-14实测:解释正文裸写中文方括号指令标签字样→解析器识别为真标签→后续全部内容被逐行拆成单行指令→回执大量"未知指令",首条是正文后半句,全部被拒执行零副作用。正确姿势:正文提及标签必须转义(反斜杠)或用英文方括号,指令标识符只出现在真正指令位置。症状特征=回执逐行未知指令轰炸。
+tag: PokerAgent, 坑, 指令格式
+<!-- END:061 -->
+<!-- ID:062 -->
+2026-11-14: PokerAgent exec 传复杂 PowerShell 脚本偶发 mangling→ParserError。症状:引号串被吞成超大 token、多语句拼行;Parse 期即拒,零执行零副作用,可直接重试。防御:脚本扁平化——不定义 function、不用 for 循环(改直接[0][1]索引)、注释全英文、try 块慎用、长 -like 通配换 -match。当日扁平化重写成功。另:memory 指令 tag 参数必须半角冒号+半角逗号,全角"tag："会报"不支持内联文本"。
+tag: PokerAgent，技巧，坑
+<!-- END:062 -->
+<!-- ID:063 -->
+2026-11-14 03:10 地底河案部署前取证终卷(全部实证,修正054):
+① LiquidRegions$Settings javap 反汇编: <clinit> DEFAULT=(liquidRegionSize 0.001, waterRegionSpawnChance 40.0, liquidAltitude -55); bipush -55 为 clinit 唯一 bipush(offset 10); 构造器校验: size<=0回0.001, chance∉[0,100]回40.0(fail-soft)。fork mixin 改 DEFAULT.altitude→-46 后,无 json 实例运行时=(0.001,40.0,-46),与 C 档验收终态等价;液面单一真相源=mixin。
+② MD5 实证: TEST 实例 mods 活跃 jar(mtime 11-12 02:20) == pre-depthfix 备份(11-13 17:59) = 87467F235392D3DF2550A018B55FCBC0 → -128 深度补丁在 2026-11-14 部署前不在 mods,054 的"TEST实例jar已打-128补丁"不成立于该时刻(去向: 或验证后恢复/或从未部署,待 max 证词)。
+③ fork noise_settings(1.20.1): min_y/height 在 noise 子对象内(取顶层必得空值): noise.min_y=-64,height=2032; dimension_type -64/800; fork 从未带 -128(054 的 fork 三版本同步为"待裁决"未执行)。
+④ BC 无内嵌 liquidregions 默认 json(纯 class 硬编码),fork 固化液面唯一可行路=mixin(已实现)。
+⑤ 洞穴密度: fork 内嵌 pack cave_spawn_chance=100(=upstream),z-bc 包(70)已随 2026-11-14 部署移出实例→运行密度=100 满格。
+tag: td情报，terrain-diffusion-mc，地底河，液面，bug根因
+<!-- END:063 -->
+<!-- ID:064 -->
+2026-11-14 03:45 地底河案 z-bc 拆包修正(推翻我基于058的差异预期):
+① D:\temp\z-bc-cave-density-removed-20261114-025920 拆包实测: cave_spawn_chance=100(非70!), carver0/1+cavern0/1 bottom_y 全=-52, 其余字段=upstream → z-bc 包内容≡内嵌包, 它是"河床-52包"而非密度包。
+② 密度70仅存在于D6时代(commit b536576 记录落地), 地底河案改写z-bc做河床固化时 chance 被 upstream 值(100)覆盖, README"密度降低"句自那时起描述不存在之物。
+③ 教训: 058长期记忆里的"z-bc=70"是历史状态非部署实况, 部署前取证必须以实拆为准, 记忆只当线索。
+④ 验收(2026-11-14 03:40 max 口头"验收通过"): 值层面零差异(液面-46/河床-52/密度100/岩浆河40/深度-64全部同值换来源), 结构差异=固化进jar+json可选+fail-loud+显示名。实例扫描: openloader空/saves无better_cave.json副本/config bettercaves仅.bak → BC参数唯一来源=内嵌包。
+⑤ 待max三决策: A README密度句删or折70 B岩浆河chance 40→15 C -128补丁去向(054待修)。清理候选: z-bc备份/liquidregions.json.bak/六旧jar(5个.bak-*尸体+1个干净2.3.0上游,建议仅留上游)。
+tag: td情报，terrain-diffusion-mc，地底河，液面，bug根因
+<!-- END:064 -->
+<!-- ID:065 -->
+2026-11-14 04:40 地底河案B(岩浆河份额)落地: BC water_region_spawn_chance 出厂默认 40→25 (水25%/岩浆75%, max裁决B=25)。实现=mixin 三处常量全改(javap实证40.0全类恰3处: clinit DEFAULT参数1+<init> fail-soft日志参数offset89+回写offset100), "默认值"整体迁移——非法json回退值与新出厂一致,不留两套默认;已有合法json用户零影响(json仍是覆盖面)。旧值40=upstream默认,058时代提过40→15方案,max终裁25。版本230.1.1.0→230.1.2.0(gradle.properties:2真身+build.gradle:230注释示例)。构建绿(schtasks tdbuild20261114b,exit0,~1min,产物lmaxs-terrain-diffusion-fork-230.1.2.0+1.20.1+forge-20261114043413.jar 8173348B),javap验尸3方法/25.0×2/-46×1断言过,toml version对。已部署TEST(mods仅230.1.2.0,旧jar归档mods-swapped-20261114-025920,MD5一致)。commit 4438a9e(4文件38+/4-)。README 30行同步(删失效密度分句+液25%岩浆75%句)。build wart待max: javac无encoding配置,GBK读UTF-8源100条警告(全落注释,零语义,修法JavaCompile统一UTF-8)。游戏仍未跑=运行时检验pending(fail-loud设计)。
+tag: td情报，terrain-diffusion-mc，地底河，液面，bug根因
+<!-- END:065 -->
+<!-- ID:066 -->
+2026-11-14 td fork git拓扑实况: origin=https://github.com/LMaxRouterCN/terrain-diffusion-plus.git(max自己的公开fork,push目标), upstream=https://github.com/derekvawdrey/terrain-diffusion-plus(直接上游), xandergos(源头作者)无remote仅历史链路。工作分支=LMax-master(GOAL-PLAN§5曾记branch=1.20.1+forge系备忘录060规范,从未落地,悬而未决)。.agent/(agent记忆目录)被git追踪且已公开在origin远端(2026-11-14确认:9-commit债清零那次push已带案卷commits如f1aeda5),属max知情既定实践;若撤需动历史或前向gitignore。.agent_trash/__external__=2026-11-10 DH评估案detprobe脚本残留(dll_diag.py/tdh_autopsy.py),未追踪无害。
+tag: td情报，terrain-diffusion-mc，fork同步
+<!-- END:066 -->

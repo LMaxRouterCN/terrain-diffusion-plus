@@ -14,8 +14,8 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 
 ## 2. Git 拓扑（已就位）
 
-- origin  = https://github.com/derekvawdrey/terrain-diffusion-plus
-- upstream = https://github.com/XanderGos/terrain-diffusion-mc
+- origin  = https://github.com/LMaxRouterCN/terrain-diffusion-plus （2026-11-14 校正: 本 fork 远端, push 目标; 原记 derekvawdrey 系 clone 时点信息）
+- upstream = https://github.com/derekvawdrey/terrain-diffusion-plus （2026-11-14 校正: 直接上游; xandergos 源头无 remote, 仅历史链路）
 - clone HEAD = 05fdcf5（BOP province catalog 提交，fork 末梢）
 - 调查用旧 clone 保留勿删：D:\Documents\my\日常\vs-td-investigation\TD-Plus
 
@@ -39,10 +39,10 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 ## 5. 构建与发布惯例（备忘录 fork 规范）
 
 - 目录：LMaxs Terrain Diffusion fork（已就位）
-- 版本号：基于原版 2.3.0 → 2.3.0.1+1.20.1+forge 起（原版版本.我的序号）
-- 发布文件名：lmaxs-terrain-diffusion-fork-2.3.0.1+1.20.1+forge-时间戳.jar
+- 版本号：备忘录 fork 规范 = [原作版本号去点].[我的版本号] → 230.1.2.0（原作 2.3.0 + 我的 1.2.0；2026-11-14 max 拍板, 随岩浆河份额 bump；230.1.1.0=首发布号）
+- 发布文件名：lmaxs-terrain-diffusion-fork-230.1.2.0+1.20.1+forge-时间戳.jar
 - branch：1.20.1+forge（未定多加载器策略，先单）
-- tag：模组版本号（如 2.3.0.1）
+- tag：模组版本号（如 230.1.2.0）
 - 更新日志只写增量
 - 构建入口（2026-11-07 侦察确认）：forge-only 用 versions\1.20.1 内跑根 gradlew 的 buildForgeWindows；根 buildMc1201Windows 会双 loader（fabric+forge），不必需
 
@@ -242,3 +242,15 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
   - 结论: 可行, 官方 worldGenOverrides 入口, 典型 2-4 天, 最大风险 = wrapper 获取
   - 待 max: 做不做 / 单机或联机范围 / 依赖策略
 - [ ] 本轮: commit (本文件) + push (github 直连恢复窗口待定)
+
+## D7 (2026-11-14) - 地底河案: 液面/河床固化进本体, 版本 230.1.2.0
+
+- [x] 根因: BC Liquid Regions 液面默认 -55 (=基岩顶) 与洞底 bottom_y 联动 — 旧世界 -63 洞底低于液面 8 格, 淹水贴墙 ("河长进基岩"观感); 深度案后 -48 洞底高于液面, 河全干消失
+- [x] C 档终态 (实例 config 侧, max 目视验收): 液面 -46 + 河床 -52 (水深 6 / 墙垫 2)
+- [x] 固化进 mod 本体 (21554e7): 河床 -52 = jar 内嵌 better_cave.json (z-bc 数据包退役); 液面 -46 = mixin @ModifyConstant clinit 唯一 -55 (BC 无内嵌默认 json, 纯 class 硬编码, mixin 唯一路); 各 json 全变可选覆盖, require 显式 fail-loud
+- [x] 验收基准 = 值层面零差异: 液面/河床/密度/岩浆河/深度全部同值换来源; z-bc 拆包 ≡ 内嵌包, 实测 chance=100 非 70 → D6 "密度降低" 早已不成立, README 失效句已删
+- [x] 岩浆河份额 (4438a9e): water_region_spawn_chance 40→25 (水 25% / 岩浆 75%, max 裁决); javap 实证 40.0 全类恰 3 处 (clinit DEFAULT 参数 1 + init fail-soft 日志/回写 2), 三处全改 = "默认值"整体迁移, 非法 json 回退与新出厂一致
+- [x] 分发命名 (2317840): distributable_name=lmaxs-terrain-diffusion-fork, version 取纯模组号, forge 产物=reobfJar
+- [ ] 游戏运行时检验 pending: fail-loud 设计 (mixin 未命中即崩, 无静默失效), 下次启动即检验
+- [ ] javac GBK 警告复燃: 本轮构建 err.log 100 条全落 overlay 编译路径下新 mixin; 11-09 曾称 "三版本根钉 UTF-8 绝根 52 条" — 覆盖面差异待查证
+- [ ] push: github 直连窗口待定

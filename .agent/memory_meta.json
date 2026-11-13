@@ -1,8 +1,8 @@
 {
-  "next_id": 48,
+  "next_id": 67,
   "memory": {
     "1": {
-      "temp": 0.0001080551387928807,
+      "temp": 24.40005751416086,
       "initial_temp": 100,
       "tags": [
         "Minecraft",
@@ -13,10 +13,10 @@
       ],
       "pin": false,
       "created_at": 1791681656.578624,
-      "last_accessed": 1793956341.8577187
+      "last_accessed": 1794597586.594872
     },
     "2": {
-      "temp": 0.00012140119388983428,
+      "temp": 1.307937335807476e-09,
       "initial_temp": 100,
       "tags": [
         "Minecraft",
@@ -40,7 +40,7 @@
       "last_accessed": 1792258648.1521723
     },
     "4": {
-      "temp": 0.06437503835409117,
+      "temp": 0.019877331224729414,
       "initial_temp": 100,
       "tags": [
         "爆炸",
@@ -52,10 +52,10 @@
       ],
       "pin": false,
       "created_at": 1792261214.864924,
-      "last_accessed": 1794012698.9284976
+      "last_accessed": 1794352901.3648999
     },
     "5": {
-      "temp": 0.0001146863024059093,
+      "temp": 1.2355932591446805e-09,
       "initial_temp": 100,
       "tags": [
         "LLMwc4n项目",
@@ -67,7 +67,7 @@
       "last_accessed": 1793956735.907802
     },
     "6": {
-      "temp": 18.72863206091071,
+      "temp": 0.00020177624565451046,
       "initial_temp": 100,
       "tags": [
         "LMaxs-Pipez-fork",
@@ -79,7 +79,7 @@
       "last_accessed": 1794233326.5842834
     },
     "7": {
-      "temp": 8.499346596152038e-05,
+      "temp": 0.0006961715045546987,
       "initial_temp": 100,
       "tags": [
         "gh-cli",
@@ -88,10 +88,10 @@
       ],
       "pin": false,
       "created_at": 1792342273.101859,
-      "last_accessed": 1793956735.9102533
+      "last_accessed": 1794262225.3242993
     },
     "8": {
-      "temp": 8.931167270280695e-10,
+      "temp": 9.622151768739747e-15,
       "initial_temp": 100,
       "tags": [
         "gh-cli",
@@ -104,7 +104,7 @@
       "last_accessed": 1792375138.7425175
     },
     "9": {
-      "temp": 0.011692825943989705,
+      "temp": 1.2597473816542947e-07,
       "initial_temp": 100,
       "tags": [
         "exec指令",
@@ -116,7 +116,7 @@
       "last_accessed": 1794000288.3664773
     },
     "10": {
-      "temp": 0.0021520313692231915,
+      "temp": 2.3185292380156638e-08,
       "initial_temp": 100,
       "tags": [
         "bug根因",
@@ -128,7 +128,7 @@
       "last_accessed": 1793992955.8343563
     },
     "11": {
-      "temp": 2.136027960849838e-09,
+      "temp": 2.301287681618224e-14,
       "initial_temp": 100,
       "tags": [
         "API坑",
@@ -139,7 +139,7 @@
       "last_accessed": 1792423021.0974405
     },
     "12": {
-      "temp": 2.3667899843211503e-09,
+      "temp": 2.549903248330442e-14,
       "initial_temp": 100,
       "tags": [
         "API坑",
@@ -150,7 +150,7 @@
       "last_accessed": 1792424513.2020724
     },
     "13": {
-      "temp": 0.00012304991183292928,
+      "temp": 1.3257000915506066e-09,
       "initial_temp": 100,
       "tags": [
         "bug根因，Minecraft",
@@ -161,7 +161,7 @@
       "last_accessed": 1793956342.043644
     },
     "14": {
-      "temp": 2.1480515291981826e-08,
+      "temp": 2.3142414866415113e-13,
       "initial_temp": 100,
       "tags": [
         "API坑",
@@ -172,7 +172,7 @@
       "last_accessed": 1793018044.9978752
     },
     "15": {
-      "temp": 0.011692843192676808,
+      "temp": 1.2597492399722528e-07,
       "initial_temp": 100,
       "tags": [
         "gh-cli",
@@ -185,7 +185,7 @@
       "last_accessed": 1794000288.3676329
     },
     "16": {
-      "temp": 9.268805342710191e-05,
+      "temp": 9.985912146023465e-10,
       "initial_temp": 100,
       "tags": [
         "EpicFight",
@@ -197,7 +197,7 @@
       "last_accessed": 1793653255.105964
     },
     "17": {
-      "temp": 0.0022133024621433356,
+      "temp": 2.3845407387828716e-08,
       "initial_temp": 100,
       "tags": [
         "EpicFight",
@@ -211,7 +211,7 @@
       "last_accessed": 1793992955.8359656
     },
     "18": {
-      "temp": 7.70234353653316e-05,
+      "temp": 8.298256682540492e-10,
       "initial_temp": 100,
       "tags": [
         "空转教训",
@@ -224,7 +224,7 @@
       "last_accessed": 1793956342.15508
     },
     "19": {
-      "temp": 18.728603705431723,
+      "temp": 0.00020177594016171835,
       "initial_temp": 100,
       "tags": [
         "Minecraft",
@@ -238,7 +238,7 @@
       "last_accessed": 1794233326.592093
     },
     "20": {
-      "temp": 6.378587365492453e-06,
+      "temp": 6.872084448039375e-11,
       "initial_temp": 100,
       "tags": [
         "API坑",
@@ -250,7 +250,7 @@
       "last_accessed": 1793569610.8163366
     },
     "21": {
-      "temp": 0.0021808408502450635,
+      "temp": 2.3495676443495767e-08,
       "initial_temp": 100,
       "tags": [
         "bug根因",
@@ -265,7 +265,7 @@
       "last_accessed": 1793992955.8375595
     },
     "22": {
-      "temp": 0.011736591452679457,
+      "temp": 1.2644625365058947e-07,
       "initial_temp": 100,
       "tags": [
         "API坑",
@@ -277,7 +277,7 @@
       "last_accessed": 1794000288.3694167
     },
     "23": {
-      "temp": 8.820381665431119e-05,
+      "temp": 9.502794928654404e-10,
       "initial_temp": 100,
       "tags": [
         "当前任务",
@@ -290,7 +290,7 @@
       "last_accessed": 1793956342.1572833
     },
     "24": {
-      "temp": 0.002201233581682692,
+      "temp": 2.3715381159501873e-08,
       "initial_temp": 100,
       "tags": [
         "bug根因，EpicFight",
@@ -314,7 +314,7 @@
       "last_accessed": 1793643083.6705348
     },
     "26": {
-      "temp": 0.002509113966256192,
+      "temp": 2.7032385194172768e-08,
       "initial_temp": 100,
       "tags": [
         "Minecraft",
@@ -327,7 +327,7 @@
       "last_accessed": 1793992955.8408897
     },
     "27": {
-      "temp": 0.011741121077228682,
+      "temp": 1.2649505436560108e-07,
       "initial_temp": 100,
       "tags": [
         "PowerShell",
@@ -339,7 +339,7 @@
       "last_accessed": 1794000288.3708827
     },
     "28": {
-      "temp": 18.72919402855029,
+      "temp": 0.00020178230011273895,
       "initial_temp": 100,
       "tags": [
         "万能闸门",
@@ -353,7 +353,7 @@
       "last_accessed": 1794233326.5997198
     },
     "29": {
-      "temp": 0.0008775227825109092,
+      "temp": 9.454147636383262e-09,
       "initial_temp": 100,
       "tags": [
         "万能闸门",
@@ -367,7 +367,7 @@
       "last_accessed": 1793973501.4615004
     },
     "30": {
-      "temp": 20.36824156635473,
+      "temp": 0.00021944087002600637,
       "initial_temp": 100,
       "tags": [
         "td情报",
@@ -379,7 +379,7 @@
       "last_accessed": 1794234336.9986174
     },
     "31": {
-      "temp": 20.36838093374363,
+      "temp": 0.03491443721584182,
       "initial_temp": 100,
       "tags": [
         "td情报",
@@ -389,10 +389,10 @@
       ],
       "pin": false,
       "created_at": 1793987835.6941965,
-      "last_accessed": 1794234337.0093985
+      "last_accessed": 1794396712.3914216
     },
     "32": {
-      "temp": 27.292783350935725,
+      "temp": 34.91701182651323,
       "initial_temp": 100,
       "tags": [
         "Minecraft",
@@ -404,10 +404,10 @@
       ],
       "pin": false,
       "created_at": 1794002430.3919463,
-      "last_accessed": 1794233326.606486
+      "last_accessed": 1794601538.234831
     },
     "33": {
-      "temp": 0.039058144624792575,
+      "temp": 4.2079986189009026e-07,
       "initial_temp": 100,
       "tags": [
         "PowerShell",
@@ -419,17 +419,17 @@
       "last_accessed": 1794004052.7047493
     },
     "34": {
-      "temp": 18.74188601432588,
+      "temp": 34.91696576420723,
       "initial_temp": 100,
       "tags": [
         "构建坑，网络环境，gh-cli，CI旁路，技巧"
       ],
       "pin": false,
       "created_at": 1794006276.1232274,
-      "last_accessed": 1794233326.613281
+      "last_accessed": 1794601538.2517924
     },
     "35": {
-      "temp": "∞",
+      "temp": 36.76572182420909,
       "initial_temp": 500,
       "tags": [
         "td情报",
@@ -438,9 +438,9 @@
         "网络环境",
         "当前任务"
       ],
-      "pin": true,
+      "pin": false,
       "created_at": 1794013147.573322,
-      "last_accessed": 1794013147.573322
+      "last_accessed": 1794601538.296354
     },
     "36": {
       "temp": "∞",
@@ -519,30 +519,31 @@
       "last_accessed": 1794069023.7032013
     },
     "42": {
-      "temp": 20.46091485290982,
+      "temp": 15.370140831896666,
       "initial_temp": 100,
       "tags": [
         "td情报",
         "terrain-diffusion-mc",
         "Minecraft",
-        "bug根因"
+        "bug根因",
+        "坑"
       ],
       "pin": false,
       "created_at": 1794082144.5751617,
-      "last_accessed": 1794234337.0195842
+      "last_accessed": 1794596211.8962657
     },
     "43": {
-      "temp": 20.92522140711661,
+      "temp": 0.03272983698234046,
       "initial_temp": 200,
       "tags": [
         "terrain-diffusion-mc，td情报，坑"
       ],
       "pin": false,
       "created_at": 1794152366.3824077,
-      "last_accessed": 1794234337.0292015
+      "last_accessed": 1794396712.3985226
     },
     "44": {
-      "temp": 21.239900444749654,
+      "temp": 0.0008105869676332731,
       "initial_temp": 100,
       "tags": [
         "td情报",
@@ -552,10 +553,10 @@
       ],
       "pin": false,
       "created_at": 1794163355.3398259,
-      "last_accessed": 1794234337.0381656
+      "last_accessed": 1794262225.3497148
     },
     "45": {
-      "temp": 81.45062499999999,
+      "temp": 36.76461717999499,
       "initial_temp": 100,
       "tags": [
         "构建坑",
@@ -564,10 +565,10 @@
       ],
       "pin": false,
       "created_at": 1794250224.3923364,
-      "last_accessed": 1794250224.3923364
+      "last_accessed": 1794601538.304914
     },
     "46": {
-      "temp": 81.45062499999999,
+      "temp": 0.042591668765872094,
       "initial_temp": 100,
       "tags": [
         "td情报",
@@ -576,10 +577,10 @@
       ],
       "pin": false,
       "created_at": 1794250239.7849371,
-      "last_accessed": 1794250239.7849371
+      "last_accessed": 1794402982.8713748
     },
     "47": {
-      "temp": 81.45062499999999,
+      "temp": 0.03305587757793697,
       "initial_temp": 100,
       "tags": [
         "td情报",
@@ -589,7 +590,230 @@
       ],
       "pin": false,
       "created_at": 1794250258.1917846,
-      "last_accessed": 1794250258.1917849
+      "last_accessed": 1794396712.4054644
+    },
+    "48": {
+      "temp": 0.0020987326101968118,
+      "initial_temp": 100,
+      "tags": [
+        "td情报",
+        "terrain-diffusion-mc",
+        "可行性审查",
+        "DH"
+      ],
+      "pin": false,
+      "created_at": 1794265340.8359866,
+      "last_accessed": 1794265340.8359869
+    },
+    "49": {
+      "temp": 0.006828325085855703,
+      "initial_temp": 100,
+      "tags": [
+        "坑",
+        "Windows",
+        "DLL",
+        "terrain-diffusion-mc",
+        "bug根因"
+      ],
+      "pin": false,
+      "created_at": 1794320049.8884883,
+      "last_accessed": 1794320049.8884885
+    },
+    "50": {
+      "temp": 0.0071877106166902145,
+      "initial_temp": 100,
+      "tags": [
+        "坑",
+        "Windows",
+        "DLL",
+        "terrain-diffusion-mc",
+        "bug根因",
+        "JVM",
+        "mod兼容"
+      ],
+      "pin": false,
+      "created_at": 1794320520.5026696,
+      "last_accessed": 1794320520.5026698
+    },
+    "51": {
+      "temp": 0.017190531077428815,
+      "initial_temp": 100,
+      "tags": [
+        "坑",
+        "日志分析",
+        "terrain-diffusion-mc"
+      ],
+      "pin": false,
+      "created_at": 1794338027.7897124,
+      "last_accessed": 1794338027.7897127
+    },
+    "52": {
+      "temp": 0.20163050597632512,
+      "initial_temp": 100,
+      "tags": [
+        "bug根因",
+        "Minecraft",
+        "td情报",
+        "terrain-diffusion-mc"
+      ],
+      "pin": false,
+      "created_at": 1794420800.8883893,
+      "last_accessed": 1794420800.8883898
+    },
+    "53": {
+      "temp": 0.31992176885088813,
+      "initial_temp": 100,
+      "tags": [
+        "terrain-diffusion-mc",
+        "td情报",
+        "bug根因，种子"
+      ],
+      "pin": false,
+      "created_at": 1794425857.345857,
+      "last_accessed": 1794425857.3458576
+    },
+    "54": {
+      "temp": 51.211343261637175,
+      "initial_temp": 100,
+      "tags": [
+        "td情报",
+        "terrain-diffusion-mc",
+        "矿石锚点",
+        "深度案",
+        "延后清单"
+      ],
+      "pin": false,
+      "created_at": 1794570086.721439,
+      "last_accessed": 1794600475.4854538
+    },
+    "55": {
+      "temp": 0.89242491504672,
+      "initial_temp": 100,
+      "tags": [
+        "td情报，terrain-diffusion-mc，深度案，洞穴，bug根因"
+      ],
+      "pin": false,
+      "created_at": 1794571471.4888604,
+      "last_accessed": 1794571471.4888606
+    },
+    "56": {
+      "temp": 47.50355439120009,
+      "initial_temp": 100,
+      "tags": [
+        "td情报，terrain-diffusion-mc，深度案，fork同步"
+      ],
+      "pin": false,
+      "created_at": 1794571842.4102252,
+      "last_accessed": 1794600475.4924328
+    },
+    "57": {
+      "temp": 0.9393946474176,
+      "initial_temp": 100,
+      "tags": [
+        "用户偏好，沟通，坑"
+      ],
+      "pin": false,
+      "created_at": 1794571849.7062278,
+      "last_accessed": 1794571849.706228
+    },
+    "58": {
+      "temp": 40.13953524365326,
+      "initial_temp": 100,
+      "tags": [
+        "td情报，terrain-diffusion-mc，深度案，地底河，液面，bug根因"
+      ],
+      "pin": false,
+      "created_at": 1794575167.5651555,
+      "last_accessed": 1794600473.9338896
+    },
+    "59": {
+      "temp": 2.0276547153583633,
+      "initial_temp": 100,
+      "tags": [
+        "Minecraft",
+        "技巧",
+        "td情报",
+        "terrain-diffusion-mc"
+      ],
+      "pin": false,
+      "created_at": 1794582843.1784685,
+      "last_accessed": 1794582843.1784687
+    },
+    "60": {
+      "temp": 38.05047296813641,
+      "initial_temp": 100,
+      "tags": [
+        "用户偏好",
+        "版本号规范",
+        "fork规范",
+        "mc模组",
+        "备忘录"
+      ],
+      "pin": false,
+      "created_at": 1794590765.199364,
+      "last_accessed": 1794601541.211818
+    },
+    "61": {
+      "temp": 7.309772651287744,
+      "initial_temp": 100,
+      "tags": [
+        "PokerAgent",
+        "坑",
+        "指令格式"
+      ],
+      "pin": false,
+      "created_at": 1794591098.7907653,
+      "last_accessed": 1794591098.7907655
+    },
+    "62": {
+      "temp": 41.812033521917705,
+      "initial_temp": 100,
+      "tags": [
+        "PokerAgent，技巧，坑"
+      ],
+      "pin": false,
+      "created_at": 1794597184.4043195,
+      "last_accessed": 1794597184.4043198
+    },
+    "63": {
+      "temp": 53.518803918818726,
+      "initial_temp": 100,
+      "tags": [
+        "td情报，terrain-diffusion-mc，地底河，液面，bug根因"
+      ],
+      "pin": false,
+      "created_at": 1794597371.7212152,
+      "last_accessed": 1794600475.5021033
+    },
+    "64": {
+      "temp": 62.23712921030514,
+      "initial_temp": 100,
+      "tags": [
+        "td情报，terrain-diffusion-mc，地底河，液面，bug根因"
+      ],
+      "pin": false,
+      "created_at": 1794600174.6721582,
+      "last_accessed": 1794600475.5097165
+    },
+    "65": {
+      "temp": 95.0,
+      "initial_temp": 100,
+      "tags": [
+        "td情报，terrain-diffusion-mc，地底河，液面，bug根因"
+      ],
+      "pin": false,
+      "created_at": 1794602493.4453208,
+      "last_accessed": 1794602493.4453216
+    },
+    "66": {
+      "temp": 100,
+      "initial_temp": 100,
+      "tags": [
+        "td情报，terrain-diffusion-mc，fork同步"
+      ],
+      "pin": false,
+      "created_at": 1794602749.2270832,
+      "last_accessed": 1794602749.2270844
     }
   }
 }
