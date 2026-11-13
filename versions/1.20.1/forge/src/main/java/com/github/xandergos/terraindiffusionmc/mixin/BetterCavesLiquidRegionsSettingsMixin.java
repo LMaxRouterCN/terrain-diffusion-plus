@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
  * mixin AP 规则: classpath 可见的 public 目标必须 value 引用, targets 字符串会被拒 (2026-11-14 编译实测)。
  * remap=false: BC 非 MC 混淆类, dev=prod 类名恒等, 不写 refmap。
  * 常量命中均为 javap 实证 (2026-11-14): -55 全类唯一 bipush (clinit);
- * 40.0 全类恰好 3 处 = clinit DEFAULT 参数 1 处 + <init> fail-soft 2 处 (offset89 日志参数 + offset100 回写),
+ * 40.0 全类恰好 3 处 = clinit DEFAULT 参数 1 处 + {@code <init>} fail-soft 2 处 (offset89 日志参数 + offset100 回写),
  * 三处全改 = "默认值"整体迁移, 非法 json 回退值与新出厂默认一致, 不留两套默认。
  * 已有合法 liquidregions.json 的用户不经过这些常量, 零影响; 用户配置面 = BC 自带 json (单一真相源)。
  */
