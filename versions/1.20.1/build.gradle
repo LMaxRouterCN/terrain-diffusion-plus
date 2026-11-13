@@ -214,8 +214,41 @@ subprojects { subproject ->
     if (isTerrainDiffusionLoaderProject) {
         String buildVariant = rootProject.ext.terrainDiffusionBuildVariant(subproject)
         subproject.ext.terrainDiffusionBuildVariant = buildVariant
-        subproject.version = "${rootProject.version}-${buildVariant}"
+        // [长期记忆: 060] fork 分发命名(备忘录规范): 设置 distributable_name 时 version 取纯模组版本,
+        // 变体段(windows/cuda/cpu)不再进入 version/文件名——变体已由 jar 内 build-variant.properties
+        // 标识(运行时 DML/CUDA/CPU 路径选择不受影响); 未设置时保持上游 "版本-变体" 原样
+        String forkDistributableName = findProperty('distributable_name')
+        if (forkDistributableName) {
+            subproject.version = rootProject.version
+        } else {
+            subproject.version = "${rootProject.version}-${buildVariant}"
+        }
         subproject.group = rootProject.group
+
+        if (forkDistributableName) {
+            // [长期记忆: 060] 分发文件名: <distributable_name>-<版本>+<mc版本>+<加载器>-<编译时间戳>.jar
+            // 例: lmaxs-terrain-diffusion-fork-230.1.1.0+1.20.1+forge-20261114011500.jar
+            // 时间戳 = 构建配置时刻(yyyyMMddHHmmss), 只进文件名, 不进 version/MANIFEST/mods.toml;
+            // 单次构建守卫: 同一 gradle 进程内所有子项目共用同一时间戳(缓存于 rootProject.ext)
+            if (!rootProject.ext.has('terrainDiffusionForkBuildTimestamp')) {
+                rootProject.ext.terrainDiffusionForkBuildTimestamp = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern('yyyyMMddHHmmss'))
+            }
+            String forkTimestamp = rootProject.ext.terrainDiffusionForkBuildTimestamp
+            String forkMinecraftVersion = rootProject.findProperty('minecraft_version')?.toString()
+            // 只重命名最终分发产物: forge=reobfJar(MDG legacyforge 把 jar 产物留在 devlibs 作 mojmap
+            // 开发包, reobfJar 输出 SRG 分发包到 libs), fabric=remapJar(Loom 分发包). jarJar 仅准备
+            // 嵌入目录(非 ArchiveTask, 不经本过滤器); 中间产物改名会断下游任务/发布链, 保持上游命名.
+            // 惰性求值是硬要求: configureEach 在任务创建瞬间同步触发(multiloader-common.gradle:176
+            // 动态引用 sourcesJar 时即因此触发过崩溃), 文件名必须包 Provider 延迟到任务执行期求值.
+            subproject.tasks.withType(AbstractArchiveTask).matching { Task archiveCandidate ->
+                archiveCandidate.name == 'reobfJar' || archiveCandidate.name == 'remapJar'
+            }.configureEach { archiveTask ->
+                archiveTask.archiveFileName = subproject.provider {
+                    String archiveVersionText = archiveTask.archiveVersion.getOrNull()?.toString() ?: subproject.version.toString()
+                    return "${forkDistributableName}-${archiveVersionText}+${forkMinecraftVersion}+${subproject.name}-${forkTimestamp}.jar".toString()
+                }
+            }
+        }
 
         subproject.repositories {
             maven { name = 'TerrainDiffusionLocalDml'; url = uri(rootProject.ext.terrainDiffusionLocalDmlMavenUrl()) }
