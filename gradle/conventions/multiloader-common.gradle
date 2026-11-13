@@ -129,7 +129,14 @@ tasks.withType(JavaCompile).configureEach { JavaCompile compileTask ->
     compileTask.options.release.set(terrainDiffusionJavaVersion)
 }
 
-// [长期记忆: 065] javadoc 编码钉版: 未钉时 javadoc tool 按平台默认编码 (中文 Windows = GBK) 读源, // UTF-8 源内中文注释/字面量触发 unmappable character 警告 (2026-11-14 构建实测 100 条; // 探针实证 :forge:javadoc encoding=null; compileJava 已钉 UTF-8, 产物不受影响, 纯日志噪音) tasks.withType(Javadoc).configureEach { org.gradle.api.tasks.javadoc.Javadoc javadocTask ->     javadocTask.options.encoding = 'UTF-8'     javadocTask.options.docEncoding = 'UTF-8'     javadocTask.options.charSet = 'UTF-8' }
+// [长期记忆: 065] javadoc 编码钉版: 未钉时 javadoc tool 按平台默认编码 (中文 Windows=GBK) 读源,
+// UTF-8 源触发 unmappable character 警告 (2026-11-14 实测 100 条, 探针实证 :forge:javadoc
+// encoding=null; compileJava 已钉 UTF-8 产物无恙, 此处为日志卫生 + HTML 编码正确性)
+tasks.withType(Javadoc).configureEach { org.gradle.api.tasks.javadoc.Javadoc javadocTask ->
+    javadocTask.options.encoding = 'UTF-8'
+    javadocTask.options.docEncoding = 'UTF-8'
+    javadocTask.options.charSet = 'UTF-8'
+}
 
 repositories {
     mavenCentral()
