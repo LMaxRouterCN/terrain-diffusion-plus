@@ -227,7 +227,7 @@ subprojects { subproject ->
 
         if (forkDistributableName) {
             // [长期记忆: 060] 分发文件名: <distributable_name>-<版本>+<mc版本>+<加载器>-<编译时间戳>.jar
-            // 例: lmaxs-terrain-diffusion-fork-230.1.1.0+1.20.1+forge-20261114011500.jar
+            // 例: lmaxs-terrain-diffusion-fork-230.1.2.0+1.20.1+forge-20261114011500.jar
             // 时间戳 = 构建配置时刻(yyyyMMddHHmmss), 只进文件名, 不进 version/MANIFEST/mods.toml;
             // 单次构建守卫: 同一 gradle 进程内所有子项目共用同一时间戳(缓存于 rootProject.ext)
             if (!rootProject.ext.has('terrainDiffusionForkBuildTimestamp')) {
