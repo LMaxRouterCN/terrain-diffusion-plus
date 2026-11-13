@@ -41,7 +41,7 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - 目录：LMaxs Terrain Diffusion fork（已就位）
 - 版本号：备忘录 fork 规范 = [原作版本号去点].[我的版本号] → 230.1.2.0（原作 2.3.0 + 我的 1.2.0；2026-11-14 max 拍板, 随岩浆河份额 bump；230.1.1.0=首发布号）
 - 发布文件名：lmaxs-terrain-diffusion-fork-230.1.2.0+1.20.1+forge-时间戳.jar
-- branch：1.20.1+forge（未定多加载器策略，先单）
+- branch：LMax-master（2026-11-14 max 定案：多版本多加载器分支项目走单一集成分支；旧记 "1.20.1+forge 先单" 作废）
 - tag：模组版本号（如 230.1.2.0）
 - 更新日志只写增量
 - 构建入口（2026-11-07 侦察确认）：forge-only 用 versions\1.20.1 内跑根 gradlew 的 buildForgeWindows；根 buildMc1201Windows 会双 loader（fabric+forge），不必需
@@ -252,5 +252,6 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - [x] 岩浆河份额 (4438a9e): water_region_spawn_chance 40→25 (水 25% / 岩浆 75%, max 裁决); javap 实证 40.0 全类恰 3 处 (clinit DEFAULT 参数 1 + init fail-soft 日志/回写 2), 三处全改 = "默认值"整体迁移, 非法 json 回退与新出厂一致
 - [x] 分发命名 (2317840): distributable_name=lmaxs-terrain-diffusion-fork, version 取纯模组号, forge 产物=reobfJar
 - [ ] 游戏运行时检验 pending: fail-loud 设计 (mixin 未命中即崩, 无静默失效), 下次启动即检验
-- [ ] javac GBK 警告复燃: 本轮构建 err.log 100 条全落 overlay 编译路径下新 mixin; 11-09 曾称 "三版本根钉 UTF-8 绝根 52 条" — 覆盖面差异待查证
-- [ ] push: github 直连窗口待定
+- [x] GBK 警告复燃 (旁线结案): 根因 = Javadoc 任务 encoding 未钉 (探针实证 :forge:javadoc enc=null), javadoc tool 按平台 GBK 读 UTF-8 源; compileJava 全链 UTF-8 产物无恙 (4 历史 jar 字面量字节级完好), javadocJar SKIPPED 无下游产物 = 纯日志噪音; 11-09 "绝根" 勘误: 当时只钉 JavaCompile, Javadoc 从未被钉; 负对照 (b7e93bc 僵尸钉版 + :forge:javadoc --rerun) 100 条警告全量复现 → b5f722d 三键钉版 (encoding/docEncoding/charSet) → 复验 0 条 unmappable; 尾巴: 残 1 条 doclint 未知标记 = mixin javadoc 内 <init> 被当 HTML 标签, 系编码修对后 javadoc 首次正确解析中文注释的副产品, fc14279 转义为 {@code <init>} (仅 javadoc 行 1 处, 代码/注解行 2 处不动), 复验 v3 全绿
+- [x] 通道事故 b7e93bc: 钉版块传输丢行退化为单行 // 注释, 钉版零生效 (commit 每文件恰 2 insertions 铁证); 067 教训: 多行内容一律 here-string 模板 + 写后结构断言
+- [x] push: b536576..fc14279 已推 origin/LMax-master (岩浆河份额 + 案卷 + README 手改 + javadoc 钉版修复 + <init> 转义 + 记忆同步)
