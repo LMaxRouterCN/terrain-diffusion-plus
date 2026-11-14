@@ -255,3 +255,12 @@ fork（derekvawdrey）已交付：河流/湖泊、雪深分层、y 路由地下�
 - [x] GBK 警告复燃 (旁线结案): 根因 = Javadoc 任务 encoding 未钉 (探针实证 :forge:javadoc enc=null), javadoc tool 按平台 GBK 读 UTF-8 源; compileJava 全链 UTF-8 产物无恙 (4 历史 jar 字面量字节级完好), javadocJar SKIPPED 无下游产物 = 纯日志噪音; 11-09 "绝根" 勘误: 当时只钉 JavaCompile, Javadoc 从未被钉; 负对照 (b7e93bc 僵尸钉版 + :forge:javadoc --rerun) 100 条警告全量复现 → b5f722d 三键钉版 (encoding/docEncoding/charSet) → 复验 0 条 unmappable; 尾巴: 残 1 条 doclint 未知标记 = mixin javadoc 内 <init> 被当 HTML 标签, 系编码修对后 javadoc 首次正确解析中文注释的副产品, fc14279 转义为 {@code <init>} (仅 javadoc 行 1 处, 代码/注解行 2 处不动), 复验 v3 全绿
 - [x] 通道事故 b7e93bc: 钉版块传输丢行退化为单行 // 注释, 钉版零生效 (commit 每文件恰 2 insertions 铁证); 067 教训: 多行内容一律 here-string 模板 + 写后结构断言
 - [x] push: b536576..fc14279 已推 origin/LMax-master (岩浆河份额 + 案卷 + README 手改 + javadoc 钉版修复 + <init> 转义 + 记忆同步)
+
+## D8 (2026-11-14) - is_overworld biome tag 补齐 (实测清单第 7 项)
+
+- [x] 定罪: 全仓零 biome tag (唯一 tag = world_preset/normal.json), TD 群系不进 #minecraft:is_overworld -> is_overworld 过滤型矿石在 TD 群系断供 (备忘录槽点实锤, 记忆 070)
+- [x] 修复: 落盘 data/minecraft/tags/worldgen/biome/is_overworld.json, 113 条 = 原版 53 (实锤提取自 mcp_config client.jar) + TD 新增 60 (biome_catalog 滤 canGenerateOverworld=true 后与原版差集)
+- [x] 首版失误修正: 全量 124 混入 NETHER x5/END x5/VOID x1; mod datapack 全世界加载 (不只 TD 世界), nether 群系错进 tag 会让过滤型矿石往原版地狱灌; canGenerateOverworld 与 kind 分布完全对齐 = 作者权威字段
+- [ ] 部署: 随下次 jar 重构建进产物, 不需新世界
+- [ ] BOP 交互备案: replace:false 合并语义若为跨包 union (待验证) 则与 BOP 同名 tag 无冲突, 若整文件覆盖则 catalog 外 BOP 群系掉 tag; 第 8 项实测一并验
+- [ ] 1.21.1/1.21.11 同病移植 (1.21.2+ 有 tag 追加语法, 届时增量式更干净)

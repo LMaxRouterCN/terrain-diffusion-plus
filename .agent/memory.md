@@ -300,3 +300,11 @@ tag: PokerAgent，坑，指令格式，技巧
 2026-11-14 td fork javadoc GBK 警告案结案 (通用构建坑): Gradle 多模块只给 JavaCompile 钉 UTF-8 不够 — Javadoc 任务有独立 encoding (未钉 = 平台默认, 中文 Windows = GBK), javadoc tool 按 GBK 读 UTF-8 源产 unmappable 警告; 即使 javadocJar SKIPPED, :forge:javadoc 任务照样执行照样报警 (在 build 依赖链上)。修法 = tasks.withType(Javadoc).configureEach 三键同钉: options.encoding + options.docEncoding + options.charSet = 'UTF-8' (源读取/HTML 输出/meta charset)。诊断手法: ①init script 探针 taskGraph.whenReady dump 全任务 encoding (--dry-run 只读); ②负对照 = 保留坏状态 --rerun 复现警告计数。落地: b5f722d (conventions + 三版本 4 文件), 负对照 100 条 → 复验 0 条。
 tag: 构建坑，gradle，javadoc
 <!-- END:068 -->
+<!-- ID:069 -->
+DH (Distant Horizons) 加速 LOD 生成模组可行性报告路径: D:\Documents\my\日常\DH加速LOD生成-可行性评估-2026-11-10.md (2026-11-10 D6 侦查产出)。结论: 可行, 官方 worldGenOverrides 入口, 典型 2-4 天工作量, 最大风险 = wrapper 获取。2026-11-14 max 拍板开干。备忘录关联槽点: DH 生成的区块没有地表河流和地物只有地形——本模组有机会一并解决。
+tag: DH加速, td情报, 可行性报告, mc模组, DistantHorizons
+<!-- END:069 -->
+<!-- ID:070 -->
+2026-11-14 is_overworld 案修复落地(实测清单第7项): versions/1.20.1/common/.../data/minecraft/tags/worldgen/biome/is_overworld.json, 113条=原版53(实锤提取自mcp_config client.jar)+TD新增60。关键教训: catalog 的 canGenerateOverworld 布尔字段是权威过滤器(与kind分布完全对齐), 枚举群系做tag必须滤它——首版全量124混入NETHER/END/VOID 11条, mod datapack 全世界加载会污染原版地狱的 is_overworld 过滤(矿石往地狱灌)。BOP交互: replace:false 若为跨包union(待实测验证)则同名tag共存无冲突。1.21.x同病留移植。
+tag: td情报, terrain-diffusion-mc, 矿石锚点, 坑
+<!-- END:070 -->
